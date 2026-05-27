@@ -2,14 +2,6 @@
 <html lang="es">
 <head>
 <meta charset="UTF-8">
-<meta name="theme-color" content="#1a1610">
-<meta name="mobile-web-app-capable" content="yes">
-<meta name="apple-mobile-web-app-capable" content="yes">
-<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-<meta name="apple-mobile-web-app-title" content="PLANEA">
-<link rel="apple-touch-icon" href="/icon-192.png">
-<link rel="icon" type="image/png" href="/icon-192.png">
-
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>PLANEA — Tu plan perfecto</title>
 <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,700;0,900;1,400;1,700&family=DM+Sans:wght@300;400;500&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
@@ -2414,53 +2406,7 @@ function printShoppingList() {
     items.forEach(ing => { html += `<li><span>${ing.nombre}${ing.notas?' <em style="color:#9a9080;font-size:11px">'+ing.notas+'</em>':''}</span><span class="qty">${formatQty(ing.cantidad_base*ratio, ing.unidad)}</span></li>`; });
     html += '</ul>';
   });
-  html += `<div class="footer">Generado con PLANEA · ${new Date().toLocaleDateString('es-ES')}</div>
-<script>
-// Manifest PWA dinámico
-(function() {
-  var manifestData = {"name":"PLANEA — Tu plan perfecto","short_name":"PLANEA","description":"Tu asistente personal para planificar el fin de semana","start_url":"/","display":"standalone","background_color":"#1a1610","theme_color":"#1a1610","orientation":"portrait","icons":[{"src":"/icon-192.png","sizes":"192x192","type":"image/png","purpose":"any maskable"},{"src":"/icon-512.png","sizes":"512x512","type":"image/png","purpose":"any maskable"}]};
-  var blob = new Blob([JSON.stringify(manifestData)], {type: 'application/manifest+json'});
-  var url = URL.createObjectURL(blob);
-  var link = document.createElement('link');
-  link.rel = 'manifest';
-  link.href = url;
-  document.head.appendChild(link);
-})();
-
-// Service Worker
-if ('serviceWorker' in navigator) {
-  window.addEventListener('load', function() {
-    var swCode = [
-      "self.addEventListener('install', function(e) { self.skipWaiting(); });",
-      "self.addEventListener('activate', function(e) { e.waitUntil(clients.claim()); });",
-      "self.addEventListener('fetch', function(e) {",
-      "  if (e.request.url.includes('workers.dev') || e.request.url.includes('anthropic')) return;",
-      "  e.respondWith(fetch(e.request).catch(function() { return caches.match(e.request); }));",
-      "});"
-    ].join('\n');
-    var blob = new Blob([swCode], {type: 'application/javascript'});
-    navigator.serviceWorker.register(URL.createObjectURL(blob))
-      .catch(function(e) { console.log('SW:', e.message); });
-  });
-}
-
-// Botón instalar
-var deferredPrompt;
-window.addEventListener('beforeinstallprompt', function(e) {
-  e.preventDefault();
-  deferredPrompt = e;
-  var btn = document.getElementById('btn-instalar-pwa');
-  if (btn) btn.style.display = 'inline-flex';
-});
-function instalarPWA() {
-  if (deferredPrompt) {
-    deferredPrompt.prompt();
-    deferredPrompt.userChoice.then(function() { deferredPrompt = null; });
-  }
-}
-</script>
-
-</body></html>`;
+  html += `<div class="footer">Generado con PLANEA · ${new Date().toLocaleDateString('es-ES')}</div></body></html>`;
   const w = window.open('','_blank');
   w.document.write(html);
   w.document.close();
@@ -3895,51 +3841,5 @@ if (document.readyState === 'loading') {
 }
 
 </script>
-
-<script>
-// Manifest PWA dinámico
-(function() {
-  var manifestData = {"name":"PLANEA — Tu plan perfecto","short_name":"PLANEA","description":"Tu asistente personal para planificar el fin de semana","start_url":"/","display":"standalone","background_color":"#1a1610","theme_color":"#1a1610","orientation":"portrait","icons":[{"src":"/icon-192.png","sizes":"192x192","type":"image/png","purpose":"any maskable"},{"src":"/icon-512.png","sizes":"512x512","type":"image/png","purpose":"any maskable"}]};
-  var blob = new Blob([JSON.stringify(manifestData)], {type: 'application/manifest+json'});
-  var url = URL.createObjectURL(blob);
-  var link = document.createElement('link');
-  link.rel = 'manifest';
-  link.href = url;
-  document.head.appendChild(link);
-})();
-
-// Service Worker
-if ('serviceWorker' in navigator) {
-  window.addEventListener('load', function() {
-    var swCode = [
-      "self.addEventListener('install', function(e) { self.skipWaiting(); });",
-      "self.addEventListener('activate', function(e) { e.waitUntil(clients.claim()); });",
-      "self.addEventListener('fetch', function(e) {",
-      "  if (e.request.url.includes('workers.dev') || e.request.url.includes('anthropic')) return;",
-      "  e.respondWith(fetch(e.request).catch(function() { return caches.match(e.request); }));",
-      "});"
-    ].join('\n');
-    var blob = new Blob([swCode], {type: 'application/javascript'});
-    navigator.serviceWorker.register(URL.createObjectURL(blob))
-      .catch(function(e) { console.log('SW:', e.message); });
-  });
-}
-
-// Botón instalar
-var deferredPrompt;
-window.addEventListener('beforeinstallprompt', function(e) {
-  e.preventDefault();
-  deferredPrompt = e;
-  var btn = document.getElementById('btn-instalar-pwa');
-  if (btn) btn.style.display = 'inline-flex';
-});
-function instalarPWA() {
-  if (deferredPrompt) {
-    deferredPrompt.prompt();
-    deferredPrompt.userChoice.then(function() { deferredPrompt = null; });
-  }
-}
-</script>
-
 </body>
 </html>
