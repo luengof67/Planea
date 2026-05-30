@@ -1273,6 +1273,7 @@ setTimeout(function() {
         <button id="view-btn-cal" onclick="setAgendaView('cal')" style="font-family:'DM Mono',monospace;font-size:10px;letter-spacing:1px;text-transform:uppercase;padding:8px 14px;border:none;cursor:pointer;background:transparent;color:var(--muted);transition:all .2s">▦ Calendario</button>
       </div>
       <button class="btn-main" onclick="shareAgenda()" id="agenda-share-btn" style="display:none;padding:12px 20px"><span>📤 Compartir</span></button>
+      <button class="btn-restart" id="agenda-notif-btn" onclick="activarNotificaciones()" style="display:none">🔔 Activar avisos</button>
       <button class="btn-restart" onclick="clearAgenda()" id="agenda-clear-btn" style="display:none">🗑 Limpiar todo</button>
     </div>
   </div>
@@ -2773,6 +2774,7 @@ function confirmAddToAgenda() {
   agenda.sort((a,b) => (a.fecha+a.hora).localeCompare(b.fecha+b.hora));
   closeAgendaModal();
   renderAgenda();
+  notifAgendaActualizada();
   updateAgendaCounter();
   const btn = document.getElementById('tab-btn-agenda');
   btn.style.color = 'var(--green)';
@@ -2835,6 +2837,8 @@ function renderAgenda() {
   }
   clearBtn.style.display = 'inline-flex';
   shareBtn.style.display = 'inline-flex';
+  var notifBtn = document.getElementById('agenda-notif-btn');
+  if (notifBtn && Notification.permission !== 'granted') notifBtn.style.display = 'inline';
 
   if (agendaView === 'cal') {
     renderCalendar(c);
@@ -4362,6 +4366,104 @@ function shareFindePlan() {
 }
 
 
+
+// ══ NOTIFICACIONES ══
+function initNotificaciones() {
+  if (!('Notification' in window)) return;
+  // Pedir permiso si no se ha dado
+  if (Notification.permission === 'default') {
+    setTimeout(function() {
+      Notification.requestPermission();
+    }, 5000); // Esperar 5s antes de pedir permiso
+  }
+  // Programar recordatorios de agenda
+  programarRecordatorios();
+}
+
+function programarRecordatorios() {
+  if (Notification.permission !== 'granted') return;
+  if (!agenda || agenda.length === 0) return;
+
+  var ahora = new Date();
+  var hoy = ahora.toISOString().slice(0,10);
+
+  agenda.forEach(function(item) {
+    if (!item.fecha || !item.hora) return;
+    if (item.fecha < hoy) return; // No notificar planes pasados
+
+    // Calcular tiempo hasta 30 min antes del plan
+    var planDate = new Date(item.fecha + 'T' + item.hora + ':00');
+    var recordatorio = new Date(planDate.getTime() - 30 * 60 * 1000); // 30 min antes
+    var msHasta = recordatorio.getTime() - ahora.getTime();
+
+    if (msHasta > 0 && msHasta < 24 * 60 * 60 * 1000) { // Solo si es hoy y en menos de 24h
+      setTimeout(function() {
+        mostrarNotificacion(
+          'Recuerda: ' + item.titulo,
+          'En 30 minutos - ' + item.hora + 'h',
+          '📅'
+        );
+      }, msHasta);
+    }
+
+    // Notificacion el mismo dia por la manana
+    if (item.fecha === hoy) {
+      var manana = new Date();
+      manana.setHours(9, 0, 0, 0);
+      var msManana = manana.getTime() - ahora.getTime();
+      if (msManana > 0) {
+        setTimeout(function() {
+          mostrarNotificacion(
+            'Plan para hoy: ' + item.titulo,
+            'A las ' + item.hora + 'h - Anade a tu agenda',
+            '🗓️'
+          );
+        }, msManana);
+      }
+    }
+  });
+}
+
+function mostrarNotificacion(titulo, cuerpo, icono) {
+  if (Notification.permission !== 'granted') return;
+  try {
+    var notif = new Notification(titulo, {
+      body: cuerpo,
+      icon: icono || '/favicon.ico',
+      badge: '/favicon.ico',
+      tag: 'planea-' + Date.now()
+    });
+    notif.onclick = function() {
+      window.focus();
+      switchTab('agenda', document.getElementById('tab-btn-agenda'));
+      notif.close();
+    };
+    setTimeout(function() { notif.close(); }, 8000);
+  } catch(e) {
+    console.log('Notificacion error:', e);
+  }
+}
+
+
+function activarNotificaciones() {
+  if (!('Notification' in window)) {
+    alert('Tu navegador no soporta notificaciones.');
+    return;
+  }
+  Notification.requestPermission().then(function(perm) {
+    if (perm === 'granted') {
+      var btn = document.getElementById('agenda-notif-btn');
+      if (btn) btn.style.display = 'none';
+      mostrarNotificacion('Notificaciones activadas', 'Te avisaremos 30 min antes de tus planes.', '🔔');
+      programarRecordatorios();
+    }
+  });
+}
+
+function notifAgendaActualizada() {
+  programarRecordatorios();
+}
+
 // ══ MODO OSCURO ══
 function toggleDarkMode() {
   var isDark = document.body.classList.toggle('dark-mode');
@@ -4395,6 +4497,7 @@ setTimeout(function() { var s = document.getElementById("splash-screen"); if(s) 
 
 function initApp() {
   initDarkMode();
+  initNotificaciones();
   loadProfile();
   buildHobbiesGrid('ob-hobbies', HOBBIES);
   renderHistorial();
