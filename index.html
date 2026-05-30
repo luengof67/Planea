@@ -347,7 +347,8 @@ body::before { content:''; position:fixed; inset:0; background-image:url("data:i
   .page { padding:0 16px 60px; }
   .hobbies-grid { grid-template-columns:repeat(2,1fr); }
   .events-grid,.games-grid,.vacation-grid { grid-template-columns:1fr; }
-  .masthead-meta { display:none; }
+  .masthead-meta { display:flex; gap:8px; flex-wrap:wrap; }
+  .meta-item { display:none; }
   .budget-grid { grid-template-columns:repeat(2,1fr); }
 }
 
@@ -828,6 +829,7 @@ setTimeout(function() {
     <h1>PL<span>A</span>NEA</h1>
     <p class="masthead-tagline">Ocio personalizado · IA + eventos reales</p>
   </div>
+  <button class="dark-toggle" id="darkToggle" onclick="toggleDarkMode()" title="Modo oscuro" style="margin-left:16px;align-self:center">🌙</button>
   <div class="masthead-meta">
     <div class="meta-item"><strong id="metaDate">—</strong>Hoy</div>
     <div class="meta-item"><strong id="metaCity">—</strong>Ubicación</div>
@@ -846,7 +848,6 @@ setTimeout(function() {
   <button class="tab-btn" onclick="switchTab('sorpresa',this);generarPlanSorpresa()">🎲 Sorpresa</button>
   <button class="tab-btn" id="tab-btn-noticias" onclick="switchTab('noticias',this);loadNoticias()">📰 Noticias</button>
   <button class="tab-btn" id="tab-btn-agenda" onclick="switchTab('agenda',this)">📋 Mi Agenda</button>
-  <button class="tab-btn" onclick="toggleDarkMode()" id="darkToggle" style="margin-left:auto">🌙</button>
 </div>
 
 <div class="page">
