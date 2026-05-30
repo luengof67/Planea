@@ -751,6 +751,53 @@ body::before { content:''; position:fixed; inset:0; background-image:url("data:i
   50%      { transform:scale(1.4); opacity:1; }
 }
 
+
+/* ══ MODO OSCURO ══ */
+body.dark-mode {
+  --cream: #1a1610;
+  --ink: #f5f0e8;
+  --line: rgba(245,240,232,0.12);
+  --card-bg: #252018;
+  --muted: #9a9080;
+  background: #1a1610;
+  color: #f5f0e8;
+}
+body.dark-mode .masthead { background: #1a1610; border-color: #f5f0e8; }
+body.dark-mode .tabs { background: #1a1610; }
+body.dark-mode .hobby-card,
+body.dark-mode .budget-card,
+body.dark-mode .duration-btn,
+body.dark-mode .event-card,
+body.dark-mode .agenda-item,
+body.dark-mode .finde-item,
+body.dark-mode .news-card,
+body.dark-mode .recipe-card,
+body.dark-mode .rest-card,
+body.dark-mode .game-card,
+body.dark-mode .vacation-card,
+body.dark-mode .aficion-result-card,
+body.dark-mode .shopping-panel,
+body.dark-mode .cal-wrap,
+body.dark-mode .chat-bubble:not(.chat-msg.user .chat-bubble),
+body.dark-mode .location-detect { background: #252018; border-color: rgba(245,240,232,0.15); }
+body.dark-mode .clima-box { background: #252018; border-color: rgba(245,240,232,0.15); }
+body.dark-mode .clima-day { background: #1a1610; }
+body.dark-mode .field-input { color: #f5f0e8; border-color: rgba(245,240,232,0.25); }
+body.dark-mode .ob-modal { background: #1a1610; }
+body.dark-mode .agenda-modal > div { background: #1a1610; }
+body.dark-mode #splash-screen { background: #0d0c09; }
+.dark-toggle {
+  background: none;
+  border: 1px solid var(--line);
+  cursor: pointer;
+  font-size: 16px;
+  padding: 6px 10px;
+  transition: all .2s;
+  color: var(--muted);
+  border-radius: 4px;
+}
+.dark-toggle:hover { border-color: var(--ink); color: var(--ink); }
+
 </style>
 </head>
 <body>
@@ -784,6 +831,7 @@ setTimeout(function() {
   <div class="masthead-meta">
     <div class="meta-item"><strong id="metaDate">—</strong>Hoy</div>
     <div class="meta-item"><strong id="metaCity">—</strong>Ubicación</div>
+    <button class="dark-toggle" id="darkToggle" onclick="toggleDarkMode()" title="Modo oscuro">🌙</button>
     <button class="btn-profile" id="btnProfile" onclick="openProfile()">⚙ Mi perfil</button>
   </div>
 </header>
@@ -4312,6 +4360,26 @@ function shareFindePlan() {
   window.open(url, '_blank');
 }
 
+
+// ══ MODO OSCURO ══
+function toggleDarkMode() {
+  var isDark = document.body.classList.toggle('dark-mode');
+  var btn = document.getElementById('darkToggle');
+  if (btn) btn.textContent = isDark ? '☀️' : '🌙';
+  try { localStorage.setItem('planea_dark_mode', isDark ? '1' : '0'); } catch(_) {}
+}
+
+function initDarkMode() {
+  try {
+    var saved = localStorage.getItem('planea_dark_mode');
+    if (saved === '1') {
+      document.body.classList.add('dark-mode');
+      var btn = document.getElementById('darkToggle');
+      if (btn) btn.textContent = '☀️';
+    }
+  } catch(_) {}
+}
+
 function hideSplash() {
   const splash = document.getElementById('splash-screen');
   if (splash) {
@@ -4325,6 +4393,7 @@ setTimeout(hideSplash, 2000);
 setTimeout(function() { var s = document.getElementById("splash-screen"); if(s) { s.style.display = "none"; } }, 4000);
 
 function initApp() {
+  initDarkMode();
   loadProfile();
   buildHobbiesGrid('ob-hobbies', HOBBIES);
   renderHistorial();
