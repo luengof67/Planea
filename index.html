@@ -795,6 +795,7 @@ setTimeout(function() {
   <button class="tab-btn" onclick="switchTab('vacaciones',this)">✈️ Vacaciones</button>
   <button class="tab-btn" onclick="switchTab('cocina',this)">🍳 Cocina</button>
   <button class="tab-btn" onclick="switchTab('aficiones',this)">🎯 Aficiones</button>
+  <button class="tab-btn" onclick="switchTab('tiempolibre',this)">⏱ Tiempo libre</button>
   <button class="tab-btn" onclick="switchTab('sorpresa',this);generarPlanSorpresa()">🎲 Sorpresa</button>
   <button class="tab-btn" id="tab-btn-noticias" onclick="switchTab('noticias',this);loadNoticias()">📰 Noticias</button>
   <button class="tab-btn" id="tab-btn-agenda" onclick="switchTab('agenda',this)">📋 Mi Agenda</button>
@@ -1333,6 +1334,82 @@ setTimeout(function() {
     </div>
   </div>
 
+</div>
+
+
+<!-- TAB: TIEMPO LIBRE -->
+<div class="section-wrap" id="tab-tiempolibre">
+  <div style="padding-bottom:32px;border-bottom:2px solid var(--ink);margin-bottom:36px">
+    <div style="font-family:'DM Mono',monospace;font-size:10px;letter-spacing:3px;text-transform:uppercase;color:var(--accent);margin-bottom:8px">Cuanto tiempo tienes?</div>
+    <h2 style="font-family:'Playfair Display',serif;font-size:32px;font-weight:700;margin-bottom:8px">Tiempo libre</h2>
+    <p style="font-size:14px;color:var(--muted)">Sugerencias adaptadas exactamente al tiempo disponible.</p>
+  </div>
+  <div id="tl-selector">
+    <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(160px,1fr));gap:12px;margin-bottom:28px">
+      <div class="hobby-card" onclick="seleccionarTiempo(this,'15 minutos','15min')" style="text-align:center;padding:24px 16px">
+        <span class="hobby-icon">&#x26A1;</span>
+        <div class="hobby-name">15 minutos</div>
+        <div style="font-size:11px;color:var(--muted);margin-top:4px">Muy poco tiempo</div>
+      </div>
+      <div class="hobby-card" onclick="seleccionarTiempo(this,'30 minutos','30min')" style="text-align:center;padding:24px 16px">
+        <span class="hobby-icon">&#x1F550;</span>
+        <div class="hobby-name">30 minutos</div>
+        <div style="font-size:11px;color:var(--muted);margin-top:4px">Un rato</div>
+      </div>
+      <div class="hobby-card" onclick="seleccionarTiempo(this,'1 hora','1h')" style="text-align:center;padding:24px 16px">
+        <span class="hobby-icon">&#x1F551;</span>
+        <div class="hobby-name">1 hora</div>
+        <div style="font-size:11px;color:var(--muted);margin-top:4px">Tiempo suficiente</div>
+      </div>
+      <div class="hobby-card" onclick="seleccionarTiempo(this,'2 horas','2h')" style="text-align:center;padding:24px 16px">
+        <span class="hobby-icon">&#x1F552;</span>
+        <div class="hobby-name">2 horas</div>
+        <div style="font-size:11px;color:var(--muted);margin-top:4px">Buena tarde</div>
+      </div>
+      <div class="hobby-card" onclick="seleccionarTiempo(this,'media jornada (3-4 horas)','4h')" style="text-align:center;padding:24px 16px">
+        <span class="hobby-icon">&#x1F305;</span>
+        <div class="hobby-name">Media jornada</div>
+        <div style="font-size:11px;color:var(--muted);margin-top:4px">3-4 horas</div>
+      </div>
+      <div class="hobby-card" onclick="seleccionarTiempo(this,'todo el dia','dia')" style="text-align:center;padding:24px 16px">
+        <span class="hobby-icon">&#x2600;&#xFE0F;</span>
+        <div class="hobby-name">Todo el dia</div>
+        <div style="font-size:11px;color:var(--muted);margin-top:4px">Jornada completa</div>
+      </div>
+    </div>
+    <div class="field-group">
+      <label class="field-label">Tu ciudad</label>
+      <input class="field-input" id="tl-city" type="text" placeholder="Tu ciudad...">
+    </div>
+    <div class="field-group">
+      <label class="field-label">Preferencia (opcional)</label>
+      <input class="field-input" id="tl-pref" type="text" placeholder="ej: sin gastar dinero, al aire libre, en casa...">
+    </div>
+    <div class="error-box" id="tl-err">Selecciona cuanto tiempo tienes.</div>
+    <button class="btn-main" onclick="generarTiempoLibre()"><span>Ver ideas</span></button>
+  </div>
+  <div id="tl-loading" style="display:none">
+    <div class="loading-wrap">
+      <p class="loading-title">Buscando ideas para tu tiempo...</p>
+      <p class="loading-sub">Adaptando sugerencias a tu disponibilidad</p>
+      <div class="progress-bar"><div class="progress-fill" id="tl-prog"></div></div>
+      <div class="loading-steps">
+        <div class="loading-step" id="tl-ls1">Analizando tiempo disponible</div>
+        <div class="loading-step" id="tl-ls2">Generando ideas adaptadas</div>
+        <div class="loading-step" id="tl-ls3">Añadiendo detalles practicos</div>
+      </div>
+    </div>
+  </div>
+  <div id="tl-results" style="display:none">
+    <div class="results-header">
+      <div>
+        <div class="results-location" id="tl-res-meta">--</div>
+        <h2 style="font-family:'Playfair Display',serif;font-size:28px;font-weight:700;margin-top:4px">Ideas para tu tiempo</h2>
+      </div>
+      <button class="btn-restart" onclick="tlRestart()">Cambiar tiempo</button>
+    </div>
+    <div class="events-grid" id="tl-grid"></div>
+  </div>
 </div>
 
 <!-- ══════════════════════════════════════
@@ -3969,7 +4046,7 @@ async function generarPlanSorpresa() {
           '<div class="event-desc">' + item.descripcion + '</div>' +
           (item.consejo ? '<div style="font-size:12px;color:var(--warm);padding:8px 12px;background:#fdf8f0;border-left:2px solid var(--gold);margin:10px 0">💡 ' + item.consejo + '</div>' : '') +
           '<div class="event-footer">' +
-          '<a class="event-link" href="' + fixUrl(item.buscar_url, 'local', item.titulo) + '" target="_blank" rel="noopener">Ver más →</a>' +
+          '<a class="event-link" href="' + fixUrl(item.buscar_url, 'articulo', item.titulo) + '" target="_blank" rel="noopener">Ver más →</a>' +
           '<button class="btn-agenda" onclick="openAgendaModal(\'' + item.titulo.replace(/'/g,"&#39;") + '\',\'' + item.descripcion.replace(/'/g,"&#39;") + '\',\'Plan Sorpresa\')">\uFF0B Agenda</button>' +
           '</div></div>';
       }).join('') + '</div>';
@@ -3980,6 +4057,100 @@ async function generarPlanSorpresa() {
     document.getElementById('sorpresa-loading').style.display = 'none';
     document.getElementById('sorpresa-inicio').style.display = 'block';
     document.getElementById('sorpresa-inicio').innerHTML += '<p style="color:var(--accent);margin-top:16px">Error generando la sorpresa. Inténtalo de nuevo.</p>';
+  }
+}
+
+
+// TIEMPO LIBRE
+var tlTiempoSeleccionado = null;
+var tlTiempoLabel = null;
+
+function seleccionarTiempo(card, label, id) {
+  document.querySelectorAll('#tl-selector .hobby-card').forEach(function(c) { c.classList.remove('selected'); });
+  card.classList.add('selected');
+  tlTiempoSeleccionado = id;
+  tlTiempoLabel = label;
+  document.getElementById('tl-err').classList.remove('visible');
+}
+
+function tlRestart() {
+  document.getElementById('tl-results').style.display = 'none';
+  document.getElementById('tl-selector').style.display = 'block';
+  document.querySelectorAll('#tl-selector .hobby-card').forEach(function(c) { c.classList.remove('selected'); });
+  tlTiempoSeleccionado = null;
+  tlTiempoLabel = null;
+  window.scrollTo({top:0,behavior:'smooth'});
+}
+
+async function generarTiempoLibre() {
+  if (!tlTiempoSeleccionado) {
+    document.getElementById('tl-err').classList.add('visible');
+    return;
+  }
+  document.getElementById('tl-err').classList.remove('visible');
+  var city = document.getElementById('tl-city').value.trim() || profile.city || 'donde estes';
+  var pref = document.getElementById('tl-pref').value.trim();
+  var hobbies = profile.hobbies.length > 0 ? profile.hobbies.join(', ') : '';
+  document.getElementById('tl-selector').style.display = 'none';
+  document.getElementById('tl-loading').style.display = 'block';
+  var prog = document.getElementById('tl-prog');
+  prog.style.width = '0%';
+  ['tl-ls1','tl-ls2','tl-ls3'].forEach(function(id, i) {
+    document.getElementById(id).classList.remove('visible','done');
+    setTimeout(function() {
+      prog.style.width = ((i+1)/3*85) + '%';
+      document.getElementById(id).classList.add('visible');
+    }, i * 900);
+  });
+  var prompt = 'Tengo exactamente ' + tlTiempoLabel + ' de tiempo libre en ' + city + '.' +
+    (hobbies ? ' Mis aficiones: ' + hobbies + '.' : '') +
+    (pref ? ' Preferencia: ' + pref + '.' : '') +
+    ' Sugiere 6 ideas concretas adaptadas EXACTAMENTE a ese tiempo. JSON: {"items":[{"titulo":"nombre","subtitulo":"tipo","descripcion":"2 frases concretas","destacados":["Duracion","Coste","Indoor/Outdoor"],"consejo":"consejo practico","buscar_url":"URL o #"}]}';
+  try {
+    var response = await fetch('https://planea-api.luengof67.workers.dev', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json', 'anthropic-version': '2023-06-01' },
+      body: JSON.stringify({
+        model: 'claude-haiku-4-5-20251001',
+        max_tokens: 2500,
+        system: 'Eres experto en ocio. Sugerencias adaptadas al tiempo indicado. Responde SOLO JSON valido.',
+        messages: [{ role: 'user', content: prompt }]
+      })
+    });
+    var data = await response.json();
+    var raw = (data.content||[]).map(function(b) { return b.text||''; }).join('');
+    var clean = raw.replace(/```json\s*/gi,'').replace(/```\s*/g,'').trim();
+    var s = clean.indexOf('{'); var e = clean.lastIndexOf('}');
+    var result = JSON.parse(clean.slice(s, e+1));
+    prog.style.width = '100%';
+    setTimeout(function() {
+      document.getElementById('tl-loading').style.display = 'none';
+      document.getElementById('tl-results').style.display = 'block';
+      document.getElementById('tl-res-meta').textContent = tlTiempoLabel + ' - ' + city;
+      var grid = document.getElementById('tl-grid');
+      grid.innerHTML = (result.items||[]).map(function(item, i) {
+        var badges = (item.destacados||[]).map(function(d) { return '<span class="event-type type-local">' + d + '</span>'; }).join(' ');
+        var url = fixUrl(item.buscar_url, 'articulo', item.titulo);
+        var tit = item.titulo.replace(/'/g, "&#39;");
+        var des = item.descripcion.replace(/'/g, "&#39;");
+        return '<div class="event-card" style="animation-delay:' + (i*0.08) + 's">' +
+          '<div style="margin-bottom:10px">' + badges + '</div>' +
+          '<div class="event-title">' + item.titulo + '</div>' +
+          '<div class="event-meta">' + (item.subtitulo||'') + '</div>' +
+          '<div class="event-desc">' + item.descripcion + '</div>' +
+          (item.consejo ? '<div style="font-size:12px;color:var(--warm);padding:8px 12px;background:#fdf8f0;border-left:2px solid var(--gold);margin:10px 0">Consejo: ' + item.consejo + '</div>' : '') +
+          '<div class="event-footer">' +
+          (url !== '#' ? '<a class="event-link" href="' + url + '" target="_blank" rel="noopener">Ver mas</a>' : '<span></span>') +
+          '<button class="btn-agenda" onclick="openAgendaModal(\'' + tit + '\',\'' + des + '\',\'Tiempo libre\')">+ Agenda</button>' +
+          '</div></div>';
+      }).join('');
+    }, 400);
+  } catch(err) {
+    console.error('TL error:', err);
+    document.getElementById('tl-loading').style.display = 'none';
+    document.getElementById('tl-selector').style.display = 'block';
+    document.getElementById('tl-err').textContent = 'Error. Intentalo de nuevo.';
+    document.getElementById('tl-err').classList.add('visible');
   }
 }
 
