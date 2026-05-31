@@ -2293,7 +2293,7 @@ async function generateVacaciones() {
 
   const prompt = `Presupuesto: ${budget} (${budgetCustom||budgetRange}). Días: ${days}. Compañía: ${who}. ${dest?'Preferencia de destino: '+dest+'.':''} ${style?'Estilo: '+style+'.':''}
 Sugiere destinos de vacaciones desde España. JSON:
-{"destinos":[{"destino":"Ciudad o región","pais":"país","presupuesto_estimado":"ej: 450€/persona vuelo+hotel","duracion_ideal":"${days}","tipo_badge":"playa|ciudad|montaña|rural|aventura|cultural","descripcion":"3 frases: qué lo hace especial y por qué encaja con el perfil","mejor_epoca":"meses recomendados","incluye":["vuelo ~X€","hotel ~X€/noche","actividades recomendadas"],"highlights":["punto fuerte 1","punto fuerte 2","punto fuerte 3"],"buscar_url":"URL ESPECÍFICA Y DIRECTA: para vuelos→skyscanner.es/[destino] o kayak.es, hoteles→booking.com/[destino] o airbnb.es, destino nacional→turismoXX.es (web oficial turismo), destino internacional→web oficial de turismo del país/ciudad. NUNCA google.com"}]}
+{"destinos":[{"destino":"Ciudad o región","pais":"país","presupuesto_estimado":"ej: 450€/persona vuelo+hotel","duracion_ideal":"${days}","tipo_badge":"playa|ciudad|montaña|rural|aventura|cultural","descripcion":"3 frases: qué lo hace especial y por qué encaja con el perfil","mejor_epoca":"meses recomendados","incluye":["vuelo ~X€","hotel ~X€/noche","actividades recomendadas"],"highlights":["punto fuerte 1","punto fuerte 2","punto fuerte 3"],"buscar_url":"URL de búsqueda del destino. Usa SIEMPRE este formato exacto: https://www.booking.com/search.html?ss=NOMBRE+DESTINO o https://www.skyscanner.es/vuelos-baratos/es/CIUDAD-DESTINO.html - NUNCA inventes rutas de URL"}]}
 5 destinos variados que encajen con el presupuesto y perfil. Realistas y concretos con precios orientativos actuales. Todo en español.`;
 
   try {
@@ -2402,7 +2402,7 @@ const TIPO_URL_FALLBACK = {
   local:    t => `https://www.thefork.es/buscar?q=${encodeURIComponent(t)}`,
   gratis:   t => `https://www.google.es/search?q=${encodeURIComponent(t)}+gratis`,
   juego:    t => `https://store.steampowered.com/search/?term=${encodeURIComponent(t)}`,
-  viaje:    t => `https://www.skyscanner.es/vuelos-baratos?destination=${encodeURIComponent(t)}`,
+  viaje:    t => `https://www.booking.com/search.html?ss=${encodeURIComponent(t)}`,
 };
 
 // Dominios conocidos y fiables
