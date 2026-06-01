@@ -4180,7 +4180,7 @@ async function generarPlanSorpresa() {
           '<div class="event-desc">' + item.descripcion + '</div>' +
           (item.consejo ? '<div style="font-size:12px;color:var(--warm);padding:8px 12px;background:#fdf8f0;border-left:2px solid var(--gold);margin:10px 0">💡 ' + item.consejo + '</div>' : '') +
           '<div class="event-footer">' +
-          '<a class="event-link" href="' + fixUrl(item.buscar_url, 'articulo', item.titulo) + '" target="_blank" rel="noopener">Ver más →</a>' +
+          '' +
           '<button class="btn-agenda" onclick="openAgendaModal(\'' + item.titulo.replace(/'/g,"&#39;") + '\',\'' + item.descripcion.replace(/'/g,"&#39;") + '\',\'Plan Sorpresa\')">\uFF0B Agenda</button>' +
           '</div></div>';
       }).join('') + '</div>';
