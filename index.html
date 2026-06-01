@@ -7,18 +7,19 @@
 <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,700;0,900;1,400;1,700&family=DM+Sans:wght@300;400;500&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
 <style>
 :root {
-  --cream: #f5f0e8;
-  --ink: #1a1610;
+  --cream: #f0ebe0;
+  --ink: #12100d;
   --warm: #8b6f47;
   --accent: #c8402a;
   --gold: #c9a84c;
-  --muted: #9a9080;
-  --line: rgba(26,22,16,0.12);
-  --card-bg: #ffffff;
+  --muted: #8a8070;
+  --line: rgba(18,16,13,0.15);
+  --card-bg: #faf6ef;
   --green: #2a7a4a;
   --blue: #2a5ab0;
   --purple: #7a2ab0;
 }
+body { background: #e8e2d6; }
 * { margin:0; padding:0; box-sizing:border-box; }
 body { background:var(--cream); color:var(--ink); font-family:'DM Sans',sans-serif; min-height:100vh; overflow-x:hidden; }
 body::before { content:''; position:fixed; inset:0; background-image:url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.04'/%3E%3C/svg%3E"); pointer-events:none; z-index:1000; opacity:.6; }
@@ -65,7 +66,7 @@ body::before { content:''; position:fixed; inset:0; background-image:url("data:i
 
 /* HOBBIES */
 .hobbies-grid { display:grid; grid-template-columns:repeat(auto-fill,minmax(145px,1fr)); gap:10px; margin-bottom:36px; }
-.hobby-card { border:1.5px solid var(--line); padding:18px 14px; cursor:pointer; transition:all .2s; background:var(--card-bg); position:relative; overflow:hidden; user-select:none; }
+.hobby-card { border:none; padding:18px 14px; cursor:pointer; transition:all .2s; background:var(--card-bg); position:relative; overflow:hidden; user-select:none; border-radius:14px; box-shadow:0 2px 10px rgba(18,16,13,.07); }
 .hobby-card::before { content:''; position:absolute; inset:0; background:var(--ink); transform:scaleY(0); transform-origin:bottom; transition:transform .25s cubic-bezier(.16,1,.3,1); z-index:0; }
 .hobby-card:hover::before,.hobby-card.selected::before { transform:scaleY(1); }
 .hobby-card:hover .hobby-name,.hobby-card.selected .hobby-name { color:var(--cream); }
@@ -146,7 +147,7 @@ body::before { content:''; position:fixed; inset:0; background-image:url("data:i
 
 /* CARDS */
 .events-grid { display:grid; grid-template-columns:repeat(auto-fill,minmax(260px,1fr)); gap:16px; }
-.event-card { border:1px solid var(--line); background:var(--card-bg); padding:22px; position:relative; transition:box-shadow .2s,transform .2s; animation:cardIn .4s ease both; }
+.event-card { border:none; background:var(--card-bg); padding:22px; position:relative; transition:box-shadow .2s,transform .2s; animation:cardIn .4s ease both; border-radius:16px; box-shadow:0 2px 12px rgba(18,16,13,.08); }
 @keyframes cardIn { from{opacity:0;transform:translateY(10px)} to{opacity:1;transform:translateY(0)} }
 .event-card:hover { box-shadow:0 6px 28px rgba(26,22,16,.1); transform:translateY(-2px); }
 .event-type { font-family:'DM Mono',monospace; font-size:9px; letter-spacing:2px; text-transform:uppercase; padding:3px 8px; margin-bottom:12px; display:inline-block; }
@@ -798,6 +799,53 @@ body.dark-mode #splash-screen { background: #0d0c09; }
   border-radius: 4px;
 }
 .dark-toggle:hover { border-color: var(--ink); color: var(--ink); }
+
+
+/* ══ BARRA NAVEGACIÓN INFERIOR ══ */
+.tabs {
+  display: none !important;
+}
+.bottom-nav {
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  background: var(--ink);
+  display: flex;
+  align-items: stretch;
+  z-index: 200;
+  box-shadow: 0 -4px 20px rgba(18,16,13,.2);
+  padding-bottom: env(safe-area-inset-bottom, 0px);
+}
+.bottom-nav-btn {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 10px 4px 8px;
+  background: none;
+  border: none;
+  cursor: pointer;
+  color: rgba(245,240,232,.45);
+  transition: color .2s;
+  font-family: 'DM Mono', monospace;
+  font-size: 9px;
+  letter-spacing: 0.5px;
+  text-transform: uppercase;
+  gap: 4px;
+  min-width: 0;
+}
+.bottom-nav-btn .nav-icon { font-size: 20px; line-height: 1; }
+.bottom-nav-btn .nav-label { font-size: 8px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 52px; }
+.bottom-nav-btn.active { color: #f5f0e8; }
+.bottom-nav-btn.active .nav-icon { filter: drop-shadow(0 0 6px rgba(201,168,76,.6)); }
+.page { padding-bottom: 80px !important; }
+@media (min-width: 768px) {
+  .tabs { display: flex !important; }
+  .bottom-nav { display: none; }
+  .page { padding-bottom: 80px !important; }
+}
 
 </style>
 </head>
@@ -2293,7 +2341,7 @@ async function generateVacaciones() {
 
   const prompt = `Presupuesto: ${budget} (${budgetCustom||budgetRange}). Días: ${days}. Compañía: ${who}. ${dest?'Preferencia de destino: '+dest+'.':''} ${style?'Estilo: '+style+'.':''}
 Sugiere destinos de vacaciones desde España. JSON:
-{"destinos":[{"destino":"Ciudad o región","pais":"país","presupuesto_estimado":"ej: 450€/persona vuelo+hotel","duracion_ideal":"${days}","tipo_badge":"playa|ciudad|montaña|rural|aventura|cultural","descripcion":"3 frases: qué lo hace especial y por qué encaja con el perfil","mejor_epoca":"meses recomendados","incluye":["vuelo ~X€","hotel ~X€/noche","actividades recomendadas"],"highlights":["punto fuerte 1","punto fuerte 2","punto fuerte 3"],"buscar_url":"URL de búsqueda del destino. Usa SIEMPRE este formato exacto: https://www.booking.com/search.html?ss=NOMBRE+DESTINO o https://www.skyscanner.es/vuelos-baratos/es/CIUDAD-DESTINO.html - NUNCA inventes rutas de URL"}]}
+{"destinos":[{"destino":"Ciudad o región","pais":"país","presupuesto_estimado":"ej: 450€/persona vuelo+hotel","duracion_ideal":"${days}","tipo_badge":"playa|ciudad|montaña|rural|aventura|cultural","descripcion":"3 frases: qué lo hace especial y por qué encaja con el perfil","mejor_epoca":"meses recomendados","incluye":["vuelo ~X€","hotel ~X€/noche","actividades recomendadas"],"highlights":["punto fuerte 1","punto fuerte 2","punto fuerte 3"],"buscar_url":"https://www.booking.com/search.html?ss=NOMBRE+DEL+DESTINO (sustituye NOMBRE+DEL+DESTINO por el nombre real del destino con + entre palabras)"}]}
 5 destinos variados que encajen con el presupuesto y perfil. Realistas y concretos con precios orientativos actuales. Todo en español.`;
 
   try {
@@ -2676,7 +2724,40 @@ function printShoppingList() {
     items.forEach(ing => { html += `<li><span>${ing.nombre}${ing.notas?' <em style="color:#9a9080;font-size:11px">'+ing.notas+'</em>':''}</span><span class="qty">${formatQty(ing.cantidad_base*ratio, ing.unidad)}</span></li>`; });
     html += '</ul>';
   });
-  html += `<div class="footer">Generado con PLANEA · ${new Date().toLocaleDateString('es-ES')}</div></body></html>`;
+  html += `<div class="footer">Generado con PLANEA · ${new Date().toLocaleDateString('es-ES')}</div>
+<!-- BARRA NAVEGACIÓN INFERIOR -->
+<nav class="bottom-nav" id="bottom-nav">
+  <button class="bottom-nav-btn active" id="bnav-hoy" onclick="switchTabNav('hoy',this)">
+    <span class="nav-icon">📅</span>
+    <span class="nav-label">Hoy</span>
+  </button>
+  <button class="bottom-nav-btn" id="bnav-finde" onclick="switchTabNav('finde',this)">
+    <span class="nav-icon">🌅</span>
+    <span class="nav-label">Finde</span>
+  </button>
+  <button class="bottom-nav-btn" id="bnav-aficiones" onclick="switchTabNav('aficiones',this)">
+    <span class="nav-icon">🎯</span>
+    <span class="nav-label">Aficiones</span>
+  </button>
+  <button class="bottom-nav-btn" id="bnav-tiempolibre" onclick="switchTabNav('tiempolibre',this)">
+    <span class="nav-icon">⏱</span>
+    <span class="nav-label">Tiempo</span>
+  </button>
+  <button class="bottom-nav-btn" id="bnav-sorpresa" onclick="switchTabNav('sorpresa',this);generarPlanSorpresa()">
+    <span class="nav-icon">🎲</span>
+    <span class="nav-label">Sorpresa</span>
+  </button>
+  <button class="bottom-nav-btn" id="bnav-agenda" onclick="switchTabNav('agenda',this)">
+    <span class="nav-icon">📋</span>
+    <span class="nav-label">Agenda</span>
+  </button>
+  <button class="bottom-nav-btn" id="bnav-noticias" onclick="switchTabNav('noticias',this);loadNoticias()">
+    <span class="nav-icon">📰</span>
+    <span class="nav-label">Noticias</span>
+  </button>
+</nav>
+
+</body></html>`;
   const w = window.open('','_blank');
   w.document.write(html);
   w.document.close();
@@ -4483,6 +4564,20 @@ function initDarkMode() {
   } catch(_) {}
 }
 
+
+// ── NAVEGACIÓN INFERIOR ──
+function switchTabNav(id, btn) {
+  // Actualizar tabs normales también
+  document.querySelectorAll('.section-wrap').forEach(function(s) { s.classList.remove('active'); });
+  var tabEl = document.getElementById('tab-' + id);
+  if (tabEl) tabEl.classList.add('active');
+  // Actualizar botones top tabs
+  document.querySelectorAll('.tab-btn').forEach(function(b) { b.classList.remove('active'); });
+  // Actualizar barra inferior
+  document.querySelectorAll('.bottom-nav-btn').forEach(function(b) { b.classList.remove('active'); });
+  if (btn) btn.classList.add('active');
+  window.scrollTo({top:0,behavior:'smooth'});
+}
 function hideSplash() {
   const splash = document.getElementById('splash-screen');
   if (splash) {
@@ -4540,5 +4635,38 @@ document.addEventListener('DOMContentLoaded', function() {
 });
 
 </script>
+
+<!-- BARRA NAVEGACIÓN INFERIOR -->
+<nav class="bottom-nav" id="bottom-nav">
+  <button class="bottom-nav-btn active" id="bnav-hoy" onclick="switchTabNav('hoy',this)">
+    <span class="nav-icon">📅</span>
+    <span class="nav-label">Hoy</span>
+  </button>
+  <button class="bottom-nav-btn" id="bnav-finde" onclick="switchTabNav('finde',this)">
+    <span class="nav-icon">🌅</span>
+    <span class="nav-label">Finde</span>
+  </button>
+  <button class="bottom-nav-btn" id="bnav-aficiones" onclick="switchTabNav('aficiones',this)">
+    <span class="nav-icon">🎯</span>
+    <span class="nav-label">Aficiones</span>
+  </button>
+  <button class="bottom-nav-btn" id="bnav-tiempolibre" onclick="switchTabNav('tiempolibre',this)">
+    <span class="nav-icon">⏱</span>
+    <span class="nav-label">Tiempo</span>
+  </button>
+  <button class="bottom-nav-btn" id="bnav-sorpresa" onclick="switchTabNav('sorpresa',this);generarPlanSorpresa()">
+    <span class="nav-icon">🎲</span>
+    <span class="nav-label">Sorpresa</span>
+  </button>
+  <button class="bottom-nav-btn" id="bnav-agenda" onclick="switchTabNav('agenda',this)">
+    <span class="nav-icon">📋</span>
+    <span class="nav-label">Agenda</span>
+  </button>
+  <button class="bottom-nav-btn" id="bnav-noticias" onclick="switchTabNav('noticias',this);loadNoticias()">
+    <span class="nav-icon">📰</span>
+    <span class="nav-label">Noticias</span>
+  </button>
+</nav>
+
 </body>
 </html>
