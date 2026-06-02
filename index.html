@@ -801,51 +801,7 @@ body.dark-mode #splash-screen { background: #0d0c09; }
 .dark-toggle:hover { border-color: var(--ink); color: var(--ink); }
 
 
-/* ══ BARRA NAVEGACIÓN INFERIOR ══ */
-.tabs {
-  display: flex;
-}
-.bottom-nav {
-  position: fixed;
-  bottom: 0;
-  left: 0;
-  right: 0;
-  background: var(--ink);
-  display: flex;
-  align-items: stretch;
-  z-index: 200;
-  box-shadow: 0 -4px 20px rgba(18,16,13,.2);
-  padding-bottom: env(safe-area-inset-bottom, 0px);
-}
-.bottom-nav-btn {
-  flex: 1;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  padding: 10px 4px 8px;
-  background: none;
-  border: none;
-  cursor: pointer;
-  color: rgba(245,240,232,.45);
-  transition: color .2s;
-  font-family: 'DM Mono', monospace;
-  font-size: 9px;
-  letter-spacing: 0.5px;
-  text-transform: uppercase;
-  gap: 4px;
-  min-width: 0;
-}
-.bottom-nav-btn .nav-icon { font-size: 20px; line-height: 1; }
-.bottom-nav-btn .nav-label { font-size: 8px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 52px; }
-.bottom-nav-btn.active { color: #f5f0e8; }
-.bottom-nav-btn.active .nav-icon { filter: drop-shadow(0 0 6px rgba(201,168,76,.6)); }
-.page { padding-bottom: 40px; }
-@media (min-width: 768px) {
-  .tabs { display: flex !important; }
-  .bottom-nav { display: none; }
-  .page { padding-bottom: 40px; }
-}
+
 
 </style>
 </head>
@@ -4739,40 +4695,7 @@ document.addEventListener('DOMContentLoaded', function() {
 </script>
 
 <!-- BARRA NAVEGACIÓN INFERIOR -->
-<nav class="bottom-nav" id="bottom-nav">
-  <button class="bottom-nav-btn active" id="bnav-hoy" onclick="switchTabNav('hoy',this)">
-    <span class="nav-icon">📅</span>
-    <span class="nav-label">Hoy</span>
-  </button>
-  <button class="bottom-nav-btn" id="bnav-finde" onclick="switchTabNav('finde',this)">
-    <span class="nav-icon">🌅</span>
-    <span class="nav-label">Finde</span>
-  </button>
-  <button class="bottom-nav-btn" id="bnav-aficiones" onclick="switchTabNav('aficiones',this)">
-    <span class="nav-icon">🎯</span>
-    <span class="nav-label">Aficiones</span>
-  </button>
-  <button class="bottom-nav-btn" id="bnav-conciertos" onclick="switchTabNav('conciertos',this)">
-    <span class="nav-icon">&#127928;</span>
-    <span class="nav-label">Conciertos</span>
-  </button>
-  <button class="bottom-nav-btn" id="bnav-tiempolibre" onclick="switchTabNav('tiempolibre',this)">
-    <span class="nav-icon">⏱</span>
-    <span class="nav-label">Tiempo</span>
-  </button>
-  <button class="bottom-nav-btn" id="bnav-sorpresa" onclick="switchTabNav('sorpresa',this);generarPlanSorpresa()">
-    <span class="nav-icon">🎲</span>
-    <span class="nav-label">Sorpresa</span>
-  </button>
-  <button class="bottom-nav-btn" id="bnav-agenda" onclick="switchTabNav('agenda',this)">
-    <span class="nav-icon">📋</span>
-    <span class="nav-label">Agenda</span>
-  </button>
-  <button class="bottom-nav-btn" id="bnav-noticias" onclick="switchTabNav('noticias',this);loadNoticias()">
-    <span class="nav-icon">📰</span>
-    <span class="nav-label">Noticias</span>
-  </button>
-</nav>
+
 
 </body>
 </html>
