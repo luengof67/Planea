@@ -881,6 +881,7 @@ body.dark-mode .agenda-modal > div { background: #1a1610; }
     </div>
     <div id="hoy-city-photo"></div>
     <div id="hoy-clima-box" class="clima-box" style="display:none"></div>
+    <div id="hoy-telefonos"></div>
     <div id="hoy-sections"></div>
     <div class="chat-wrap" id="hoy-chat-wrap" style="display:none">
       <div class="chat-header">
@@ -992,6 +993,7 @@ body.dark-mode .agenda-modal > div { background: #1a1610; }
     </div>
     <div id="finde-city-photo"></div>
     <div id="finde-clima-box" class="clima-box" style="display:none"></div>
+    <div id="finde-telefonos"></div>
     <div id="finde-sections"></div>
     <div class="chat-wrap" id="finde-chat-wrap" style="display:none">
       <div class="chat-header">
@@ -2163,6 +2165,7 @@ function renderHoy(plan, city) {
   if (hoyShareBtn) hoyShareBtn.style.display = 'inline';
   fetchCityPhoto(city, 'hoy-city-photo');
   fetchClima(city, 'hoy-clima-box');
+  fetchTelefonos(city, 'hoy-telefonos');
   const c = document.getElementById('hoy-sections');
   c.innerHTML = '';
   (plan.secciones||[]).forEach((sec,si) => {
@@ -2230,6 +2233,7 @@ function renderFinde(plan, city, numDays) {
   if (findeShareBtn) findeShareBtn.style.display = 'inline';
   fetchCityPhoto(city, 'finde-city-photo');
   fetchClima(city, 'finde-clima-box');
+  fetchTelefonos(city, 'finde-telefonos');
   const c = document.getElementById('finde-sections');
   c.innerHTML = '';
   const wrap = document.createElement('div');
@@ -4558,6 +4562,72 @@ function activarNotificaciones() {
 
 function notifAgendaActualizada() {
   programarRecordatorios();
+}
+
+
+// ══ TELÉFONOS DE INTERÉS ══
+var telefonosCache = {};
+
+async function fetchTelefonos(city, containerId) {
+  var container = document.getElementById(containerId);
+  if (!container) return;
+
+  // Números fijos siempre iguales en España
+  var fijos = [
+    { icon: '🚨', label: 'Emergencias', numero: '112' },
+    { icon: '🚔', label: 'Policía Nacional', numero: '091' },
+    { icon: '🚒', label: 'Bomberos', numero: '080' },
+    { icon: '🚑', label: 'Urgencias médicas', numero: '061' },
+  ];
+
+  // Mostrar primero los fijos
+  renderTelefonos(container, city, fijos, null);
+
+  // Si ya tenemos caché para esta ciudad
+  if (telefonosCache[city]) {
+    renderTelefonos(container, city, fijos, telefonosCache[city]);
+    return;
+  }
+
+  // Pedir a Claude los teléfonos específicos de la ciudad
+  try {
+    var response = await fetch('https://planea-api.luengof67.workers.dev', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json', 'anthropic-version': '2023-06-01' },
+      body: JSON.stringify({
+        model: 'claude-haiku-4-5-20251001',
+        max_tokens: 500,
+        system: 'Eres un asistente que proporciona telefonos de interes de ciudades. Responde SOLO JSON valido sin markdown.',
+        messages: [{ role: 'user', content: 'Dame los telefonos de interes de ' + city + ' (España). Incluye: taxi principal, hospital de referencia, turismo municipal, policia local. Solo si los conoces con certeza. JSON: {"telefonos":[{"icon":"🚕","label":"Taxi","numero":"NUMERO"},{"icon":"🏥","label":"Hospital","numero":"NUMERO"},{"icon":"🏛️","label":"Turismo","numero":"NUMERO"},{"icon":"👮","label":"Policia Local","numero":"NUMERO"}]}' }]
+      })
+    });
+    var data = await response.json();
+    var raw = (data.content||[]).map(function(b) { return b.text||''; }).join('');
+    var clean = raw.replace(/```json\s*/gi,'').replace(/```\s*/g,'').trim();
+    var s = clean.indexOf('{'); var e = clean.lastIndexOf('}');
+    var result = JSON.parse(clean.slice(s, e+1));
+    telefonosCache[city] = result.telefonos || [];
+    renderTelefonos(container, city, fijos, telefonosCache[city]);
+  } catch(err) {
+    console.log('Telefonos error:', err);
+  }
+}
+
+function renderTelefonos(container, city, fijos, extras) {
+  var todos = fijos.concat(extras || []);
+  container.innerHTML = '<div style="background:var(--card-bg);border-radius:16px;padding:16px 20px;margin-bottom:16px;box-shadow:0 2px 12px rgba(18,16,13,.08)">' +
+    '<div style="font-family:monospace;font-size:10px;letter-spacing:2px;text-transform:uppercase;color:var(--muted);margin-bottom:12px">Telefonos de interes · ' + city + '</div>' +
+    '<div style="display:grid;grid-template-columns:repeat(2,1fr);gap:8px">' +
+    todos.map(function(t) {
+      return '<a href="tel:' + t.numero + '" style="display:flex;align-items:center;gap:8px;padding:8px 10px;background:var(--cream);border-radius:10px;text-decoration:none;color:var(--ink)">' +
+        '<span style="font-size:18px">' + t.icon + '</span>' +
+        '<div>' +
+          '<div style="font-size:11px;color:var(--muted);line-height:1">' + t.label + '</div>' +
+          '<div style="font-size:14px;font-weight:700;font-family:monospace">' + t.numero + '</div>' +
+        '</div>' +
+        '</a>';
+    }).join('') +
+    '</div></div>';
 }
 
 // ══ MODO OSCURO ══
