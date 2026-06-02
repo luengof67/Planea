@@ -840,37 +840,18 @@ body.dark-mode #splash-screen { background: #0d0c09; }
 .bottom-nav-btn .nav-label { font-size: 8px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 52px; }
 .bottom-nav-btn.active { color: #f5f0e8; }
 .bottom-nav-btn.active .nav-icon { filter: drop-shadow(0 0 6px rgba(201,168,76,.6)); }
-.page { padding-bottom: 80px !important; }
+.page { padding-bottom: 90px !important; }
 @media (min-width: 768px) {
   .tabs { display: flex !important; }
   .bottom-nav { display: none; }
-  .page { padding-bottom: 80px !important; }
+  .page { padding-bottom: 90px !important; }
 }
 
 </style>
 </head>
 <body>
 
-<!-- SPLASH SCREEN -->
-<div id="splash-screen">
-  <div class="splash-logo">PL<span>A</span>NEA</div>
-  <div class="splash-tagline">Tu plan perfecto</div>
-  <div class="splash-dot"></div>
-</div>
-<script>
-// Ocultar splash de emergencia - se ejecuta antes que todo
-window.addEventListener('load', function() {
-  setTimeout(function() {
-    var s = document.getElementById('splash-screen');
-    if (s) { s.style.opacity = '0'; s.style.visibility = 'hidden'; s.style.display = 'none'; }
-  }, 1500);
-});
-// Por si load no llega
-setTimeout(function() {
-  var s = document.getElementById('splash-screen');
-  if (s) { s.style.opacity = '0'; s.style.visibility = 'hidden'; s.style.display = 'none'; }
-}, 5000);
-</script>
+
 
 <header class="masthead">
   <div class="masthead-logo">
@@ -892,8 +873,9 @@ setTimeout(function() {
   <button class="tab-btn" onclick="switchTab('vacaciones',this)">✈️ Vacaciones</button>
   <button class="tab-btn" onclick="switchTab('cocina',this)">🍳 Cocina</button>
   <button class="tab-btn" onclick="switchTab('aficiones',this)">🎯 Aficiones</button>
-  <button class="tab-btn" onclick="switchTab('tiempolibre',this)">⏱ Tiempo libre</button>
-  <button class="tab-btn" onclick="switchTab('sorpresa',this);generarPlanSorpresa()">🎲 Sorpresa</button>
+  <button class="tab-btn" onclick="switchTab('conciertos',this)">&#127928; Conciertos</button>
+  <button class="tab-btn" onclick="switchTab('tiempolibre',this)">&#9201; Tiempo libre</button>
+  
   <button class="tab-btn" id="tab-btn-noticias" onclick="switchTab('noticias',this);loadNoticias()">📰 Noticias</button>
   <button class="tab-btn" id="tab-btn-agenda" onclick="switchTab('agenda',this)">📋 Mi Agenda</button>
 </div>
@@ -1434,6 +1416,51 @@ setTimeout(function() {
 
 </div>
 
+
+<!-- TAB: CONCIERTOS -->
+<div class="section-wrap" id="tab-conciertos">
+  <div style="padding-bottom:32px;border-bottom:2px solid var(--ink);margin-bottom:36px">
+    <div style="font-family:'DM Mono',monospace;font-size:10px;letter-spacing:3px;text-transform:uppercase;color:var(--accent);margin-bottom:8px">Busca artistas y eventos</div>
+    <h2 style="font-family:'Playfair Display',serif;font-size:32px;font-weight:700;margin-bottom:8px">Conciertos</h2>
+    <p style="font-size:14px;color:var(--muted)">Busca a tu artista favorito y descubre sus proximas actuaciones.</p>
+  </div>
+  <div id="conciertos-form">
+    <div class="field-group">
+      <label class="field-label">Artista o grupo</label>
+      <input class="field-input" id="conciertos-artista" type="text" placeholder="ej: Bad Bunny, Coldplay, Rosalia...">
+    </div>
+    <div class="field-group">
+      <label class="field-label">Pais o ciudad (opcional)</label>
+      <input class="field-input" id="conciertos-lugar" type="text" placeholder="ej: Espana, Madrid, Barcelona...">
+    </div>
+    <div class="error-box" id="conciertos-err">Escribe el nombre de un artista.</div>
+    <button class="btn-main" onclick="buscarConciertos()"><span>Buscar conciertos</span></button>
+  </div>
+  <div id="conciertos-loading" style="display:none">
+    <div class="loading-wrap">
+      <p class="loading-title">Buscando conciertos...</p>
+      <p class="loading-sub">Buscando informacion del artista</p>
+      <div class="progress-bar"><div class="progress-fill" id="conciertos-prog"></div></div>
+      <div class="loading-steps">
+        <div class="loading-step" id="conciertos-ls1">Buscando informacion del artista</div>
+        <div class="loading-step" id="conciertos-ls2">Buscando proximas fechas</div>
+        <div class="loading-step" id="conciertos-ls3">Preparando resultados</div>
+      </div>
+    </div>
+  </div>
+  <div id="conciertos-results" style="display:none">
+    <div class="results-header">
+      <div>
+        <div class="results-location" id="conciertos-meta">--</div>
+        <h2 style="font-family:'Playfair Display',serif;font-size:28px;font-weight:700;margin-top:4px" id="conciertos-titulo">Conciertos</h2>
+      </div>
+      <button class="btn-restart" onclick="conciertosRestart()">&#x2190; Buscar otro</button>
+    </div>
+    <div id="conciertos-info"></div>
+    <div id="conciertos-links" style="margin:24px 0"></div>
+    <div id="conciertos-grid" class="events-grid"></div>
+  </div>
+</div>
 
 <!-- TAB: TIEMPO LIBRE -->
 <div class="section-wrap" id="tab-tiempolibre">
@@ -2739,14 +2766,15 @@ function printShoppingList() {
     <span class="nav-icon">🎯</span>
     <span class="nav-label">Aficiones</span>
   </button>
+  <button class="bottom-nav-btn" id="bnav-conciertos" onclick="switchTabNav('conciertos',this)">
+    <span class="nav-icon">&#127928;</span>
+    <span class="nav-label">Conciertos</span>
+  </button>
   <button class="bottom-nav-btn" id="bnav-tiempolibre" onclick="switchTabNav('tiempolibre',this)">
     <span class="nav-icon">⏱</span>
     <span class="nav-label">Tiempo</span>
   </button>
-  <button class="bottom-nav-btn" id="bnav-sorpresa" onclick="switchTabNav('sorpresa',this);generarPlanSorpresa()">
-    <span class="nav-icon">🎲</span>
-    <span class="nav-label">Sorpresa</span>
-  </button>
+  
   <button class="bottom-nav-btn" id="bnav-agenda" onclick="switchTabNav('agenda',this)">
     <span class="nav-icon">📋</span>
     <span class="nav-label">Agenda</span>
@@ -2894,7 +2922,6 @@ function setAgendaView(v) {
   document.getElementById('view-btn-cal').style.background = v === 'cal' ? 'var(--ink)' : 'transparent';
   document.getElementById('view-btn-cal').style.color = v === 'cal' ? 'var(--cream)' : 'var(--muted)';
   renderAgenda();
-  hideSplash();
 }
 
 function renderAgenda() {
@@ -4195,6 +4222,111 @@ async function generarPlanSorpresa() {
 }
 
 
+
+// CONCIERTOS
+function conciertosRestart() {
+  document.getElementById('conciertos-results').style.display = 'none';
+  document.getElementById('conciertos-form').style.display = 'block';
+  document.getElementById('conciertos-artista').value = '';
+  document.getElementById('conciertos-lugar').value = '';
+  window.scrollTo({top:0,behavior:'smooth'});
+}
+
+async function buscarConciertos() {
+  var artista = document.getElementById('conciertos-artista').value.trim();
+  if (!artista) {
+    document.getElementById('conciertos-err').classList.add('visible');
+    return;
+  }
+  document.getElementById('conciertos-err').classList.remove('visible');
+  var lugar = document.getElementById('conciertos-lugar').value.trim() || 'Espana';
+
+  document.getElementById('conciertos-form').style.display = 'none';
+  document.getElementById('conciertos-loading').style.display = 'block';
+
+  var prog = document.getElementById('conciertos-prog');
+  prog.style.width = '0%';
+  ['conciertos-ls1','conciertos-ls2','conciertos-ls3'].forEach(function(id, i) {
+    document.getElementById(id).classList.remove('visible','done');
+    setTimeout(function() {
+      prog.style.width = ((i+1)/3*85) + '%';
+      document.getElementById(id).classList.add('visible');
+    }, i * 900);
+  });
+
+  var prompt = 'Artista o grupo: "' + artista + '". Lugar: "' + lugar + '".' +
+    ' Proporciona: 1) Biografia breve (2-3 frases). 2) Estilo musical. 3) Albums principales (max 3). 4) Informacion sobre su gira actual o proxima si existe. 5) Proximas fechas de conciertos en ' + lugar + ' si las conoces con certeza.' +
+    ' Responde SOLO JSON: {"nombre":"nombre oficial del artista","genero":"genero musical","bio":"2-3 frases","albumes":["album1","album2"],"gira":{"nombre":"nombre de la gira o null","descripcion":"descripcion breve o null"},"conciertos":[{"ciudad":"ciudad","fecha":"fecha aproximada o confirmed","venue":"sala o estadio","nota":"info extra"}],"ticketmaster_url":"https://www.ticketmaster.es/search?q=ARTISTA","songkick_url":"https://www.songkick.com/search?query=ARTISTA","setlist_url":"https://www.setlist.fm/search?query=ARTISTA"}';
+
+  try {
+    var response = await fetch('https://planea-api.luengof67.workers.dev', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json', 'anthropic-version': '2023-06-01' },
+      body: JSON.stringify({
+        model: 'claude-haiku-4-5-20251001',
+        max_tokens: 2000,
+        system: 'Eres experto en musica y conciertos. IMPORTANTE: Solo incluye conciertos que conozcas con certeza. Si no tienes datos de conciertos confirmados deja el array vacio. Responde SOLO JSON valido.',
+        messages: [{ role: 'user', content: prompt }]
+      })
+    });
+    var data = await response.json();
+    var raw = (data.content||[]).map(function(b) { return b.text||''; }).join('');
+    var clean = raw.replace(/```json\s*/gi,'').replace(/```\s*/g,'').trim();
+    var s = clean.indexOf('{'); var e = clean.lastIndexOf('}');
+    var result = JSON.parse(clean.slice(s, e+1));
+
+    prog.style.width = '100%';
+    setTimeout(function() {
+      document.getElementById('conciertos-loading').style.display = 'none';
+      document.getElementById('conciertos-results').style.display = 'block';
+      document.getElementById('conciertos-meta').textContent = result.genero || '';
+      document.getElementById('conciertos-titulo').textContent = result.nombre || artista;
+
+      // Info del artista
+      var infoHtml = '<div style="background:var(--card-bg);border-radius:16px;padding:20px;margin-bottom:20px;box-shadow:0 2px 12px rgba(18,16,13,.08)">' +
+        '<p style="font-size:15px;line-height:1.6;margin-bottom:12px">' + (result.bio||'') + '</p>' +
+        (result.albumes && result.albumes.length ? '<div style="font-size:12px;color:var(--muted)">Discografia destacada: ' + result.albumes.join(', ') + '</div>' : '') +
+        (result.gira && result.gira.nombre ? '<div style="margin-top:12px;padding:10px 14px;background:#fdf8f0;border-left:3px solid var(--gold);border-radius:4px;font-size:13px"><strong>' + result.gira.nombre + '</strong><br>' + (result.gira.descripcion||'') + '</div>' : '') +
+        '</div>';
+      document.getElementById('conciertos-info').innerHTML = infoHtml;
+
+      // Links de busqueda
+      var linksHtml = '<div style="display:flex;gap:10px;flex-wrap:wrap;margin-bottom:20px">' +
+        '<a href="' + (result.ticketmaster_url || ('https://www.ticketmaster.es/search?q=' + encodeURIComponent(artista))) + '" target="_blank" rel="noopener" class="btn-main" style="padding:12px 20px;font-size:13px;text-decoration:none"><span>&#127915; Ticketmaster</span></a>' +
+        '<a href="' + (result.songkick_url || ('https://www.songkick.com/search?query=' + encodeURIComponent(artista))) + '" target="_blank" rel="noopener" class="btn-restart" style="text-decoration:none">Songkick</a>' +
+        '<a href="' + (result.setlist_url || ('https://www.setlist.fm/search?query=' + encodeURIComponent(artista))) + '" target="_blank" rel="noopener" class="btn-restart" style="text-decoration:none">Setlist.fm</a>' +
+        '</div>';
+      document.getElementById('conciertos-links').innerHTML = linksHtml;
+
+      // Conciertos
+      var conciertos = result.conciertos || [];
+      if (conciertos.length > 0) {
+        var grid = document.getElementById('conciertos-grid');
+        grid.innerHTML = '<h3 style="font-family:Georgia,serif;font-size:20px;margin-bottom:16px">Proximas fechas conocidas</h3>' +
+          conciertos.map(function(c, i) {
+            return '<div class="event-card" style="animation-delay:' + (i*0.08) + 's">' +
+              '<div style="font-family:monospace;font-size:11px;letter-spacing:1px;color:var(--accent);margin-bottom:6px">' + (c.fecha||'Fecha por confirmar') + '</div>' +
+              '<div class="event-title">' + (c.ciudad||'') + '</div>' +
+              '<div class="event-meta">' + (c.venue||'') + '</div>' +
+              (c.nota ? '<div class="event-desc">' + c.nota + '</div>' : '') +
+              '<div class="event-footer">' +
+              '<a class="event-link" href="https://www.ticketmaster.es/search?q=' + encodeURIComponent(artista + ' ' + (c.ciudad||'')) + '" target="_blank" rel="noopener">Buscar entradas</a>' +
+              '</div></div>';
+          }).join('');
+      } else {
+        document.getElementById('conciertos-grid').innerHTML = '<div style="text-align:center;padding:32px;color:var(--muted);font-size:14px">No tengo datos confirmados de proximas fechas.<br>Busca en Ticketmaster o Songkick para informacion actualizada.</div>';
+      }
+    }, 400);
+
+  } catch(err) {
+    console.error('Conciertos error:', err);
+    document.getElementById('conciertos-loading').style.display = 'none';
+    document.getElementById('conciertos-form').style.display = 'block';
+    document.getElementById('conciertos-err').textContent = 'Error buscando informacion. Intentalo de nuevo.';
+    document.getElementById('conciertos-err').classList.add('visible');
+  }
+}
+
 // TIEMPO LIBRE
 var tlTiempoSeleccionado = null;
 var tlTiempoLabel = null;
@@ -4649,6 +4781,10 @@ document.addEventListener('DOMContentLoaded', function() {
   <button class="bottom-nav-btn" id="bnav-aficiones" onclick="switchTabNav('aficiones',this)">
     <span class="nav-icon">🎯</span>
     <span class="nav-label">Aficiones</span>
+  </button>
+  <button class="bottom-nav-btn" id="bnav-conciertos" onclick="switchTabNav('conciertos',this)">
+    <span class="nav-icon">&#127928;</span>
+    <span class="nav-label">Conciertos</span>
   </button>
   <button class="bottom-nav-btn" id="bnav-tiempolibre" onclick="switchTabNav('tiempolibre',this)">
     <span class="nav-icon">⏱</span>
