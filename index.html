@@ -789,7 +789,7 @@ body.dark-mode .agenda-modal > div { background: #1a1610; }
   <button class="tab-btn" onclick="switchTab('conciertos',this)">&#127928; Conciertos</button>
   <button class="tab-btn" onclick="switchTab('tiempolibre',this)">&#9201; Tiempo libre</button>
   
-  <button class="tab-btn" id="tab-btn-noticias" onclick="switchTab('noticias',this);loadNoticias()">📰 Noticias</button>
+  
   <button class="tab-btn" id="tab-btn-agenda" onclick="switchTab('agenda',this)">📋 Mi Agenda</button>
 </div>
 
@@ -1458,7 +1458,7 @@ body.dark-mode .agenda-modal > div { background: #1a1610; }
     <div style="font-size:64px;margin-bottom:20px;animation:splashPulse 2s ease infinite">🎲</div>
     <h2 style="font-family:'Playfair Display',serif;font-size:32px;font-weight:700;margin-bottom:12px">Plan Sorpresa</h2>
     <p style="font-size:15px;color:var(--muted);max-width:400px;margin:0 auto 32px;line-height:1.6">Deja que PLANEA decida por ti. Generamos un plan aleatorio basado en tu perfil y ubicación.</p>
-    <button class="btn-main" onclick="generarPlanSorpresa()" id="sorpresa-btn"><span>🎲 ¡Sorpréndeme!</span></button>
+    
   </div>
   <div id="sorpresa-loading" style="display:none">
     <div class="loading-wrap">
@@ -4589,7 +4589,6 @@ function switchTabNav(id, btn) {
   // Actualizar botones top tabs
   document.querySelectorAll('.tab-btn').forEach(function(b) { b.classList.remove('active'); });
   // Actualizar barra inferior
-  document.querySelectorAll('.bottom-nav-btn').forEach(function(b) { b.classList.remove('active'); });
   if (btn) btn.classList.add('active');
   window.scrollTo({top:0,behavior:'smooth'});
 }
