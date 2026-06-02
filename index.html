@@ -803,7 +803,7 @@ body.dark-mode #splash-screen { background: #0d0c09; }
 
 /* ══ BARRA NAVEGACIÓN INFERIOR ══ */
 .tabs {
-  display: none !important;
+  display: flex;
 }
 .bottom-nav {
   position: fixed;
@@ -840,11 +840,11 @@ body.dark-mode #splash-screen { background: #0d0c09; }
 .bottom-nav-btn .nav-label { font-size: 8px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 52px; }
 .bottom-nav-btn.active { color: #f5f0e8; }
 .bottom-nav-btn.active .nav-icon { filter: drop-shadow(0 0 6px rgba(201,168,76,.6)); }
-.page { padding-bottom: 90px !important; }
+.page { padding-bottom: 40px; }
 @media (min-width: 768px) {
   .tabs { display: flex !important; }
   .bottom-nav { display: none; }
-  .page { padding-bottom: 90px !important; }
+  .page { padding-bottom: 40px; }
 }
 
 </style>
@@ -2753,37 +2753,7 @@ function printShoppingList() {
   });
   html += `<div class="footer">Generado con PLANEA · ${new Date().toLocaleDateString('es-ES')}</div>
 <!-- BARRA NAVEGACIÓN INFERIOR -->
-<nav class="bottom-nav" id="bottom-nav">
-  <button class="bottom-nav-btn active" id="bnav-hoy" onclick="switchTabNav('hoy',this)">
-    <span class="nav-icon">📅</span>
-    <span class="nav-label">Hoy</span>
-  </button>
-  <button class="bottom-nav-btn" id="bnav-finde" onclick="switchTabNav('finde',this)">
-    <span class="nav-icon">🌅</span>
-    <span class="nav-label">Finde</span>
-  </button>
-  <button class="bottom-nav-btn" id="bnav-aficiones" onclick="switchTabNav('aficiones',this)">
-    <span class="nav-icon">🎯</span>
-    <span class="nav-label">Aficiones</span>
-  </button>
-  <button class="bottom-nav-btn" id="bnav-conciertos" onclick="switchTabNav('conciertos',this)">
-    <span class="nav-icon">&#127928;</span>
-    <span class="nav-label">Conciertos</span>
-  </button>
-  <button class="bottom-nav-btn" id="bnav-tiempolibre" onclick="switchTabNav('tiempolibre',this)">
-    <span class="nav-icon">⏱</span>
-    <span class="nav-label">Tiempo</span>
-  </button>
-  
-  <button class="bottom-nav-btn" id="bnav-agenda" onclick="switchTabNav('agenda',this)">
-    <span class="nav-icon">📋</span>
-    <span class="nav-label">Agenda</span>
-  </button>
-  <button class="bottom-nav-btn" id="bnav-noticias" onclick="switchTabNav('noticias',this);loadNoticias()">
-    <span class="nav-icon">📰</span>
-    <span class="nav-label">Noticias</span>
-  </button>
-</nav>
+
 
 </body></html>`;
   const w = window.open('','_blank');
