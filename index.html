@@ -701,49 +701,7 @@ body::before { content:''; position:fixed; inset:0; background-image:url("data:i
   .news-featured-aside { display: none; }
 }
 
-/* ══ SPLASH SCREEN ══ */
-#splash-screen {
-  position: fixed;
-  inset: 0;
-  background: #1a1610;
-  z-index: 9999;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  transition: opacity .6s ease, visibility .6s ease;
-}
-#splash-screen.hidden {
-  opacity: 0;
-  visibility: hidden;
-  pointer-events: none;
-}
-.splash-logo {
-  font-family: 'Playfair Display', serif;
-  font-size: 56px;
-  font-weight: 900;
-  color: #f5f0e8;
-  letter-spacing: -2px;
-  margin-bottom: 8px;
-  animation: splashIn .8s cubic-bezier(.16,1,.3,1) both;
-}
-.splash-logo span { color: #c8402a; }
-.splash-tagline {
-  font-family: 'DM Mono', monospace;
-  font-size: 10px;
-  letter-spacing: 3px;
-  text-transform: uppercase;
-  color: rgba(245,240,232,.5);
-  animation: splashIn .8s .2s cubic-bezier(.16,1,.3,1) both;
-}
-.splash-dot {
-  width: 6px;
-  height: 6px;
-  background: #c9a84c;
-  border-radius: 50%;
-  margin-top: 40px;
-  animation: splashPulse 1.2s ease infinite;
-}
+
 @keyframes splashIn {
   from { opacity:0; transform:translateY(20px); }
   to   { opacity:1; transform:translateY(0); }
@@ -787,7 +745,6 @@ body.dark-mode .clima-day { background: #1a1610; }
 body.dark-mode .field-input { color: #f5f0e8; border-color: rgba(245,240,232,0.25); }
 body.dark-mode .ob-modal { background: #1a1610; }
 body.dark-mode .agenda-modal > div { background: #1a1610; }
-body.dark-mode #splash-screen { background: #0d0c09; }
 .dark-toggle {
   background: none;
   border: 1px solid var(--line);
@@ -4636,17 +4593,6 @@ function switchTabNav(id, btn) {
   if (btn) btn.classList.add('active');
   window.scrollTo({top:0,behavior:'smooth'});
 }
-function hideSplash() {
-  const splash = document.getElementById('splash-screen');
-  if (splash) {
-    setTimeout(() => splash.classList.add('hidden'), 800);
-  }
-}
-
-// Seguridad: ocultar splash siempre después de 2 segundos máximo
-setTimeout(hideSplash, 2000);
-// Emergencia: forzar ocultación a los 4 segundos
-setTimeout(function() { var s = document.getElementById("splash-screen"); if(s) { s.style.display = "none"; } }, 4000);
 
 function initApp() {
   initDarkMode();
