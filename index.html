@@ -2140,7 +2140,7 @@ async function generateHoy() {
 
   const prompt = `Hoy es ${today}. Ciudad: ${city}. Aficiones: ${hobbies.join(', ')}${extra?', '+extra:''}. ${mood?'Preferencia: '+mood+'.':''}
 Genera un plan de ocio personalizado para hoy. JSON:
-{"secciones":[{"icono":"emoji","titulo":"título","tipo":"eventos_locales|contenido_digital|lecturas|especial|gratis","es_gratis":true,"items":[{"titulo":"nombre","tipo_badge":"cine|teatro|musica|deporte|feria|libro|articulo|serie|local|gratis","es_gratis":true,"meta":"info adicional","descripcion":"2 frases concretas","fecha_sugerida":"si aplica, fecha aproximada","enlace_texto":"texto del enlace","enlace_url":"URL ESPECÍFICA Y DIRECTA: para cine→filmaffinity.com o imdb.com, teatro/música/eventos→web oficial del teatro/sala/venue o entradas.com o ticketmaster.es, museos→web oficial del museo, series→netflix.com o hbo.com o primevideo.com, libros→goodreads.com o casadellibro.com, artículos→URL real del artículo en el medio, YouTube→youtube.com/watch, podcasts→spotify.com o ivoox.com. NUNCA google.com"}]}]}
+{"secciones":[{"icono":"emoji","titulo":"título","tipo":"eventos_locales|contenido_digital|lecturas|especial|gratis","es_gratis":true,"items":[{"titulo":"nombre","tipo_badge":"cine|teatro|musica|deporte|feria|libro|articulo|serie|local|gratis","es_gratis":true,"meta":"info adicional","descripcion":"2 frases concretas","fecha_sugerida":"si aplica, fecha aproximada","enlace_texto":"texto del enlace","enlace_url":"URL DE BUSQUEDA (no inventes URLs directas): cine/series→https://www.filmaffinity.com/es/search.php?stype=title&stext=TITULO, conciertos/teatro/eventos→https://www.ticketmaster.es/search?q=TITULO+CIUDAD, museos/cultura→https://www.google.es/search?q=NOMBRE+LUGAR, libros→https://www.casadellibro.com/busqueda-generica?busqueda=TITULO, musica→https://open.spotify.com/search/ARTISTA, podcasts→https://www.ivoox.com/buscar_sq_f1_TITULO_1.html, youtube→https://www.youtube.com/results?search_query=TITULO. Sustituye TITULO CIUDAD ARTISTA etc por el nombre real del item"}]}]}
 4 secciones, 3-4 items cada una. Específico, no genérico. Todo en español. IMPORTANTE: incluye obligatoriamente al menos 1 sección completamente gratuita (artículos online gratis, podcasts gratis, eventos gratuitos, museos gratis ese día, contenido YouTube, apps gratis...) con "es_gratis":true en la sección y en cada item. Para items gratuitos, "tipo_badge" debe ser "gratis". En el resto de secciones, si algún item es gratuito marca también "es_gratis":true en ese item.`;
 
   try {
@@ -2194,7 +2194,7 @@ async function generateFinde() {
 
   const prompt = `Ciudad: ${city}. Días: ${numDays}. Compañía: ${who}. ${hobbies?'Aficiones: '+hobbies+'.':''} Fechas: ${weekend}.
 Genera un plan de fin de semana organizado por días. JSON:
-{"dias":[{"dia":"Sábado 24 de mayo","actividades":[{"hora":"10:00","titulo":"nombre","tipo_badge":"cine|teatro|musica|deporte|feria|local|libro|gratis","es_gratis":true,"descripcion":"2 frases concretas y útiles","fecha_sugerida":"${weekend.split(',')[0] || 'este fin de semana'}","enlace_texto":"texto","enlace_url":"URL ESPECÍFICA Y DIRECTA: teatro/conciertos→web oficial del recinto o ticketmaster.es o entradas.com, museos→web oficial del museo, cine→filmaffinity.com, restaurantes→web oficial o thefork.es, parques/espacios→web del ayuntamiento o página oficial. NUNCA google.com"}]}]}
+{"dias":[{"dia":"Sábado 24 de mayo","actividades":[{"hora":"10:00","titulo":"nombre","tipo_badge":"cine|teatro|musica|deporte|feria|local|libro|gratis","es_gratis":true,"descripcion":"2 frases concretas y útiles","fecha_sugerida":"${weekend.split(',')[0] || 'este fin de semana'}","enlace_texto":"texto","enlace_url":"URL DE BUSQUEDA: conciertos/teatro→https://www.ticketmaster.es/search?q=TITULO+CIUDAD, museos→https://www.google.es/search?q=NOMBRE+LUGAR, cine→https://www.filmaffinity.com/es/search.php?stype=title&stext=TITULO, gastronomia→https://www.thefork.es/buscar?q=NOMBRE+CIUDAD, naturaleza/rutas→https://www.wikiloc.com/wikiloc/find.do?q=TITULO. Sustituye con nombre real"}]}]}
 ${numDays} días con 4-5 actividades cada uno, mañana/tarde/noche. Realista para ${city}. Todo en español. IMPORTANTE: en cada día incluye al menos 1-2 actividades completamente gratuitas (mercados gratis, parques, museos gratis, rutas a pie, eventos gratuitos, miradores...) con "es_gratis":true y "tipo_badge":"gratis".`;
 
   try {
@@ -2260,7 +2260,7 @@ function renderFindeItem(act, i) {
       </div>
       <div class="finde-item-desc">${act.descripcion}</div>
       <div class="finde-item-footer">
-        ${act.enlace_url||act.titulo?`<a class="event-link" href="${getSmartUrl(act.titulo, act.tipo_badge)}" target="_blank" rel="noopener">${act.enlace_texto||'Buscar'} →</a>`:''}
+        ${act.enlace_url||act.titulo?`<a class="event-link" href="${act.enlace_url && act.enlace_url.startsWith('http') ? act.enlace_url : getSmartUrl(act.titulo, act.tipo_badge)}" target="_blank" rel="noopener">${act.enlace_texto||'Buscar'} →</a>`:''}
         <button class="btn-agenda" onclick="openAgendaModal('${tit}','${des}','Fin de semana')">＋ Agenda</button>
       </div>
     </div>
@@ -2350,7 +2350,7 @@ function renderEventCard(item, i, withCal=false, fuente='Plan de hoy') {
     ${item.meta?`<div class="event-meta">${item.meta}</div>`:''}
     <div class="event-desc">${item.descripcion}</div>
     <div class="event-footer">
-      ${`<a class="event-link" href="${getSmartUrl(item.titulo, item.tipo_badge)}" target="_blank" rel="noopener">${item.enlace_texto||'Buscar'} →</a>`}
+      ${`<a class="event-link" href="${item.enlace_url && item.enlace_url.startsWith('http') ? item.enlace_url : getSmartUrl(item.titulo, item.tipo_badge)}" target="_blank" rel="noopener">${item.enlace_texto||'Buscar'} →</a>`}
       <div style="display:flex;gap:6px;align-items:center">
         <button class="btn-agenda" onclick="openAgendaModal('${tit}','${des}','${fue}')">＋ Agenda</button>
       </div>
