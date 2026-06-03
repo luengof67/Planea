@@ -2260,7 +2260,7 @@ function renderFindeItem(act, i) {
       </div>
       <div class="finde-item-desc">${act.descripcion}</div>
       <div class="finde-item-footer">
-        ${act.enlace_url||act.titulo?`<a class="event-link" href="${(TIPO_URL_FALLBACK[act.tipo_badge]||TIPO_URL_FALLBACK.gratis)(act.titulo)}" target="_blank" rel="noopener">${act.enlace_texto||'Buscar'} →</a>`:''}
+        ${act.enlace_url||act.titulo?`<a class="event-link" href="${getSmartUrl(act.titulo, act.tipo_badge)}" target="_blank" rel="noopener">${act.enlace_texto||'Buscar'} →</a>`:''}
         <button class="btn-agenda" onclick="openAgendaModal('${tit}','${des}','Fin de semana')">＋ Agenda</button>
       </div>
     </div>
@@ -2350,7 +2350,7 @@ function renderEventCard(item, i, withCal=false, fuente='Plan de hoy') {
     ${item.meta?`<div class="event-meta">${item.meta}</div>`:''}
     <div class="event-desc">${item.descripcion}</div>
     <div class="event-footer">
-      ${`<a class="event-link" href="${(TIPO_URL_FALLBACK[item.tipo_badge]||TIPO_URL_FALLBACK.gratis)(item.titulo)}" target="_blank" rel="noopener">${item.enlace_texto||'Buscar'} →</a>`}
+      ${`<a class="event-link" href="${getSmartUrl(item.titulo, item.tipo_badge)}" target="_blank" rel="noopener">${item.enlace_texto||'Buscar'} →</a>`}
       <div style="display:flex;gap:6px;align-items:center">
         <button class="btn-agenda" onclick="openAgendaModal('${tit}','${des}','${fue}')">＋ Agenda</button>
       </div>
@@ -2409,6 +2409,25 @@ const DOMINIOS_FIABLES = [
   'apps.apple.com','elpais.com','elmundo.es','lavanguardia.com','rtve.es',
   'google.es','google.com','ivoox.com','museodelprado.es','museoreinasofia.es'
 ];
+
+function getSmartUrl(titulo, tipo) {
+  var t = titulo.toLowerCase();
+  // Detectar conciertos y eventos en vivo
+  if (/concierto|festival|actuaci|entradas|directo|live|gira|tour/.test(t)) {
+    return 'https://www.ticketmaster.es/search?q=' + encodeURIComponent(titulo);
+  }
+  // Detectar restaurantes
+  if (/restaurante|bar|taberna|cena|comida|tapas|gastronomia/.test(t)) {
+    return 'https://www.thefork.es/buscar?q=' + encodeURIComponent(titulo);
+  }
+  // Detectar pelicula o serie
+  if (/pelicula|serie|documental|film|cine/.test(t)) {
+    return 'https://www.filmaffinity.com/es/search.php?stype=title&stext=' + encodeURIComponent(titulo);
+  }
+  // Usar el fallback por tipo
+  var fb = TIPO_URL_FALLBACK[tipo] || TIPO_URL_FALLBACK.gratis;
+  return fb(titulo);
+}
 
 function esDominioFiable(url) {
   try {
