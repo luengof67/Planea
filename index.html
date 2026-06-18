@@ -2260,7 +2260,7 @@ function renderFindeItem(act, i) {
       </div>
       <div class="finde-item-desc">${act.descripcion}</div>
       <div class="finde-item-footer">
-        ${act.enlace_url||act.titulo?`<a class="event-link" href="${act.enlace_url && act.enlace_url.startsWith('http') ? act.enlace_url : getSmartUrl(act.titulo, act.tipo_badge)}" target="_blank" rel="noopener">${act.enlace_texto||'Buscar'} →</a>`:''}
+        ${act.enlace_url||act.titulo?`<a class="event-link" href="${fixUrl(act.enlace_url, act.tipo_badge, act.titulo)}" target="_blank" rel="noopener">${act.enlace_texto||'Buscar'} →</a>`:''}
         <button class="btn-agenda" onclick="openAgendaModal('${tit}','${des}','Fin de semana')">＋ Agenda</button>
       </div>
     </div>
@@ -2350,7 +2350,7 @@ function renderEventCard(item, i, withCal=false, fuente='Plan de hoy') {
     ${item.meta?`<div class="event-meta">${item.meta}</div>`:''}
     <div class="event-desc">${item.descripcion}</div>
     <div class="event-footer">
-      ${`<a class="event-link" href="${item.enlace_url && item.enlace_url.startsWith('http') ? item.enlace_url : getSmartUrl(item.titulo, item.tipo_badge)}" target="_blank" rel="noopener">${item.enlace_texto||'Buscar'} →</a>`}
+      <a class="event-link" href="${fixUrl(item.enlace_url, item.tipo_badge, item.titulo)}" target="_blank" rel="noopener">${item.enlace_texto||'Buscar'} →</a>
       <div style="display:flex;gap:6px;align-items:center">
         <button class="btn-agenda" onclick="openAgendaModal('${tit}','${des}','${fue}')">＋ Agenda</button>
       </div>
