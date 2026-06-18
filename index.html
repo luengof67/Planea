@@ -1660,6 +1660,9 @@ body.dark-mode .agenda-modal > div { background: #1a1610; }
 const now = new Date();
 document.getElementById('metaDate').textContent = now.toLocaleDateString('es-ES',{weekday:'long',day:'numeric',month:'long'});
 
+// Ciudad activa: se usa para construir enlaces locales (cine, teatro, eventos...)
+let currentCity = '';
+
 // ══════════════════════════════════════
 // ONBOARDING / PERFIL
 // ══════════════════════════════════════
@@ -2129,6 +2132,7 @@ async function generateHoy() {
   if(!city){document.getElementById('hoy-err2').classList.add('visible');return;}
   document.getElementById('hoy-err2').classList.remove('visible');
   state.hoy.city = city;
+  currentCity = city;
   document.getElementById('metaCity').textContent = city;
   const hobbies = [...document.querySelectorAll('#hoy-hobbies .hobby-card.selected')].map(c=>c.querySelector('.hobby-name').textContent);
   const extra = document.getElementById('hoy-extra').value.trim();
@@ -2141,7 +2145,7 @@ async function generateHoy() {
   const prompt = `Hoy es ${today}. Ciudad: ${city}. Aficiones: ${hobbies.join(', ')}${extra?', '+extra:''}. ${mood?'Preferencia: '+mood+'.':''}
 Genera un plan de ocio personalizado para hoy. JSON:
 {"secciones":[{"icono":"emoji","titulo":"título","tipo":"eventos_locales|contenido_digital|lecturas|especial|gratis","es_gratis":true,"items":[{"titulo":"nombre","tipo_badge":"cine|teatro|musica|deporte|feria|libro|articulo|serie|local|gratis","es_gratis":true,"meta":"info adicional","descripcion":"2 frases concretas","fecha_sugerida":"si aplica, fecha aproximada","enlace_texto":"texto del enlace","enlace_url":"URL DE BUSQUEDA (no inventes URLs directas): cine/series→https://www.filmaffinity.com/es/search.php?stype=title&stext=TITULO, conciertos/teatro/eventos→https://www.ticketmaster.es/search?q=TITULO+CIUDAD, museos/cultura→https://www.google.es/search?q=NOMBRE+LUGAR, libros→https://www.casadellibro.com/busqueda-generica?busqueda=TITULO, musica→https://open.spotify.com/search/ARTISTA, podcasts→https://www.ivoox.com/buscar_sq_f1_TITULO_1.html, youtube→https://www.youtube.com/results?search_query=TITULO. Sustituye TITULO CIUDAD ARTISTA etc por el nombre real del item"}]}]}
-4 secciones, 3-4 items cada una. Específico, no genérico. Todo en español. Para tipo_badge "cine": propón SOLO películas que estén AHORA MISMO en cartelera en ${city} (estrenos recientes o reestrenos/pases especiales que confirmes con la búsqueda web). NUNCA marques como "cine" una película que solo esté en plataformas de streaming: esas van en la sección de contenido digital con tipo_badge "serie". IMPORTANTE: incluye obligatoriamente al menos 1 sección completamente gratuita (artículos online gratis, podcasts gratis, eventos gratuitos, museos gratis ese día, contenido YouTube, apps gratis...) con "es_gratis":true en la sección y en cada item. Para items gratuitos, "tipo_badge" debe ser "gratis". En el resto de secciones, si algún item es gratuito marca también "es_gratis":true en ese item.`;
+4 secciones, 3-4 items cada una. Específico, no genérico. Todo en español. Para tipo_badge "cine": SOLO películas que estén HOY en cartelera en ${city}, verificadas con la búsqueda web; en "meta" indica el nombre del cine y un horario real. Si NO puedes confirmar una sesión real en ${city}, no la propongas como cine. Nunca marques como "cine" una película que solo esté en plataformas (Netflix, Disney+, Prime, etc.): esas van como tipo_badge "serie" en contenido digital. IMPORTANTE: incluye obligatoriamente al menos 1 sección completamente gratuita (artículos online gratis, podcasts gratis, eventos gratuitos, museos gratis ese día, contenido YouTube, apps gratis...) con "es_gratis":true en la sección y en cada item. Para items gratuitos, "tipo_badge" debe ser "gratis". En el resto de secciones, si algún item es gratuito marca también "es_gratis":true en ese item.`;
 
   try {
     const plan = await callClaude(prompt, 'Eres experto en ocio y cultura española. Responde SOLO JSON válido, completo y bien formado.');
@@ -2184,6 +2188,7 @@ async function generateFinde() {
   if(!city){document.getElementById('finde-err2').classList.add('visible');return;}
   document.getElementById('finde-err2').classList.remove('visible');
   state.finde.city = city;
+  currentCity = city;
   const hobbies = document.getElementById('finde-hobbies').value.trim();
   const numDays = findeDays || '2';
   const who = findeWho || 'solo';
@@ -2195,7 +2200,7 @@ async function generateFinde() {
   const prompt = `Ciudad: ${city}. Días: ${numDays}. Compañía: ${who}. ${hobbies?'Aficiones: '+hobbies+'.':''} Fechas: ${weekend}.
 Genera un plan de fin de semana organizado por días. JSON:
 {"dias":[{"dia":"Sábado 24 de mayo","actividades":[{"hora":"10:00","titulo":"nombre","tipo_badge":"cine|teatro|musica|deporte|feria|local|libro|gratis","es_gratis":true,"descripcion":"2 frases concretas y útiles","fecha_sugerida":"${weekend.split(',')[0] || 'este fin de semana'}","enlace_texto":"texto","enlace_url":"URL DE BUSQUEDA: conciertos/teatro→https://www.ticketmaster.es/search?q=TITULO+CIUDAD, museos→https://www.google.es/search?q=NOMBRE+LUGAR, cine→https://www.filmaffinity.com/es/search.php?stype=title&stext=TITULO, gastronomia→https://www.thefork.es/buscar?q=NOMBRE+CIUDAD, naturaleza/rutas→https://www.wikiloc.com/wikiloc/find.do?q=TITULO. Sustituye con nombre real"}]}]}
-${numDays} días con 4-5 actividades cada uno, mañana/tarde/noche. Realista para ${city}. Todo en español. Para tipo_badge "cine": propón SOLO películas que estén AHORA MISMO en cartelera en ${city} (estrenos o reestrenos/pases especiales verificados con la búsqueda web); nunca pongas como "cine" una película que solo esté en streaming. IMPORTANTE: en cada día incluye al menos 1-2 actividades completamente gratuitas (mercados gratis, parques, museos gratis, rutas a pie, eventos gratuitos, miradores...) con "es_gratis":true y "tipo_badge":"gratis".`;
+${numDays} días con 4-5 actividades cada uno, mañana/tarde/noche. Realista para ${city}. Todo en español. Para tipo_badge "cine": SOLO películas que estén en cartelera ese fin de semana en ${city}, verificadas con la búsqueda web; en "meta" indica el cine y un horario real. Si no puedes confirmar una sesión real en ${city}, no la propongas como cine; nunca pongas como "cine" una película que solo esté en streaming. IMPORTANTE: en cada día incluye al menos 1-2 actividades completamente gratuitas (mercados gratis, parques, museos gratis, rutas a pie, eventos gratuitos, miradores...) con "es_gratis":true y "tipo_badge":"gratis".`;
 
   try {
     const plan = await callClaude(prompt, 'Eres experto en ocio y cultura española. Responde SOLO JSON válido, completo y bien formado.');
@@ -2410,25 +2415,6 @@ const DOMINIOS_FIABLES = [
   'google.es','google.com','ivoox.com','museodelprado.es','museoreinasofia.es'
 ];
 
-function getSmartUrl(titulo, tipo) {
-  var t = titulo.toLowerCase();
-  // Detectar conciertos y eventos en vivo
-  if (/concierto|festival|actuaci|entradas|directo|live|gira|tour/.test(t)) {
-    return 'https://www.ticketmaster.es/search?q=' + encodeURIComponent(titulo);
-  }
-  // Detectar restaurantes
-  if (/restaurante|bar|taberna|cena|comida|tapas|gastronomia/.test(t)) {
-    return 'https://www.thefork.es/buscar?q=' + encodeURIComponent(titulo);
-  }
-  // Detectar pelicula o serie
-  if (/pelicula|serie|documental|film|cine/.test(t)) {
-    return 'https://www.filmaffinity.com/es/search.php?stype=title&stext=' + encodeURIComponent(titulo);
-  }
-  // Usar el fallback por tipo
-  var fb = TIPO_URL_FALLBACK[tipo] || TIPO_URL_FALLBACK.gratis;
-  return fb(titulo);
-}
-
 function esDominioFiable(url) {
   try {
     const hostname = new URL(url).hostname.replace('www.','');
@@ -2436,27 +2422,37 @@ function esDominioFiable(url) {
   } catch(_) { return false; }
 }
 
+// ¿Es una URL de página de búsqueda genérica? (no un enlace directo y concreto)
+function esUrlBusqueda(url) {
+  return /\/search|search\.php|[?&](q|query|stext|busqueda|term|ss)=|\/buscar|\/results|\/find\.do/i.test(url);
+}
+
+// Construye una búsqueda de Google añadiendo la ciudad activa cuando aplica.
+function buscaGoogle(titulo, palabras, conCiudad) {
+  const partes = [titulo, palabras || '', conCiudad ? currentCity : ''].filter(Boolean);
+  return 'https://www.google.es/search?q=' + encodeURIComponent(partes.join(' ').trim());
+}
+
 function fixUrl(url, tipo, titulo) {
-  // Cine, series, teatro y ferias: los buscadores específicos (Filmaffinity por título,
-  // Ticketmaster) fallan muy a menudo porque solo cubren una parte. Para estos tipos
-  // mandamos siempre a una búsqueda de Google, que encuentra dónde verlo o comprar entrada.
-  if (tipo === 'cine' || tipo === 'serie' || tipo === 'teatro' || tipo === 'feria') {
-    return TIPO_URL_FALLBACK[tipo](titulo);
+  // EVENTOS / ACTIVIDADES EN VIVO: construimos siempre la búsqueda nosotros, con la ciudad.
+  // Los portales (Ticketmaster, Filmaffinity por título) cubren solo una parte y dejan al
+  // usuario en "0 resultados", así que no nos fiamos de la URL que proponga la IA.
+  switch (tipo) {
+    case 'cine':    return buscaGoogle(titulo, 'cartelera cine', true);
+    case 'teatro':  return buscaGoogle(titulo, 'teatro entradas', true);
+    case 'musica':  return buscaGoogle(titulo, 'concierto entradas', true);
+    case 'deporte': return buscaGoogle(titulo, 'entradas', true);
+    case 'feria':   return buscaGoogle(titulo, '', true);
+    case 'local':   return buscaGoogle(titulo, '', true);
+    case 'gratis':  return buscaGoogle(titulo, '', true);
+    case 'serie':   return buscaGoogle(titulo, 'serie dónde ver', false);
   }
-  if (!url || url === '#') {
-    const fb = TIPO_URL_FALLBACK[tipo];
-    return fb ? fb(titulo) : 'https://www.google.es/search?q=' + encodeURIComponent(titulo);
-  }
-  if (/google\.(com|es)\/search\?q=/i.test(url) && !url.includes('tbm=nws')) {
-    const fb = TIPO_URL_FALLBACK[tipo];
-    return fb ? fb(titulo) : url;
-  }
-  if (!esDominioFiable(url)) {
-    const fb = TIPO_URL_FALLBACK[tipo];
-    if (fb) return fb(titulo);
-    return 'https://www.google.es/search?q=' + encodeURIComponent(titulo);
-  }
-  return url;
+  // CONTENIDO (artículos, libros, juegos, viajes...): si la IA dio un enlace DIRECTO y fiable
+  // (no una página de búsqueda), lo respetamos, porque suele ser el enlace real encontrado.
+  if (url && url !== '#' && !esUrlBusqueda(url) && esDominioFiable(url)) return url;
+  // Si no, caemos al buscador específico del tipo, o a Google con la ciudad.
+  const fb = TIPO_URL_FALLBACK[tipo];
+  return fb ? fb(titulo) : buscaGoogle(titulo, '', true);
 }
 
 // ══ COCINA ══
@@ -3767,6 +3763,7 @@ async function generateAficion() {
   });
 
   const city = af.needsCity ? (document.getElementById('aficion-city').value.trim() || profile.city || '') : '';
+  if (city) currentCity = city;
   if (af.needsCity && !city) {
     document.getElementById('aficion-err').textContent = 'Indica tu ciudad.';
     document.getElementById('aficion-err').classList.add('visible');
@@ -4079,6 +4076,7 @@ async function generarPlanSorpresa() {
   // Elegir categoría al azar
   const cat = SORPRESA_CATEGORIAS[Math.floor(Math.random() * SORPRESA_CATEGORIAS.length)];
   const city = profile.city || 'Madrid';
+  currentCity = profile.city || '';
   const hobbies = profile.hobbies.length > 0 ? profile.hobbies.join(', ') : 'variado';
 
   const prompt = cat.prompt + ' Ciudad: ' + city + '. Aficiones del usuario: ' + hobbies + '. Genera 4 sugerencias concretas y específicas. Responde SOLO JSON sin backticks: {"items":[{"titulo":"nombre","subtitulo":"tipo · lugar","descripcion":"2 frases concretas y atractivas","destacados":["dato1","dato2","dato3"],"consejo":"consejo práctico útil","buscar_url":"URL real y directa"}]}';
@@ -4267,6 +4265,7 @@ async function generarTiempoLibre() {
   }
   document.getElementById('tl-err').classList.remove('visible');
   var city = document.getElementById('tl-city').value.trim() || profile.city || 'donde estes';
+  if (city && city !== 'donde estes') currentCity = city;
   var pref = document.getElementById('tl-pref').value.trim();
   var hobbies = profile.hobbies.length > 0 ? profile.hobbies.join(', ') : '';
   document.getElementById('tl-selector').style.display = 'none';
