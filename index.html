@@ -787,7 +787,6 @@ body.dark-mode .agenda-modal > div { background: #1a1610; }
   <button class="tab-btn" onclick="switchTab('cocina',this)">🍳 Cocina</button>
   <button class="tab-btn" onclick="switchTab('aficiones',this)">🎯 Aficiones</button>
   <button class="tab-btn" onclick="switchTab('conciertos',this)">&#127928; Conciertos</button>
-  <button class="tab-btn" onclick="switchTab('tiempolibre',this)">&#9201; Tiempo libre</button>
   
   
   <button class="tab-btn" id="tab-btn-agenda" onclick="switchTab('agenda',this)">📋 Mi Agenda</button>
@@ -1374,81 +1373,6 @@ body.dark-mode .agenda-modal > div { background: #1a1610; }
     <div id="conciertos-info"></div>
     <div id="conciertos-links" style="margin:24px 0"></div>
     <div id="conciertos-grid" class="events-grid"></div>
-  </div>
-</div>
-
-<!-- TAB: TIEMPO LIBRE -->
-<div class="section-wrap" id="tab-tiempolibre">
-  <div style="padding-bottom:32px;border-bottom:2px solid var(--ink);margin-bottom:36px">
-    <div style="font-family:'DM Mono',monospace;font-size:10px;letter-spacing:3px;text-transform:uppercase;color:var(--accent);margin-bottom:8px">Cuanto tiempo tienes?</div>
-    <h2 style="font-family:'Playfair Display',serif;font-size:32px;font-weight:700;margin-bottom:8px">Tiempo libre</h2>
-    <p style="font-size:14px;color:var(--muted)">Sugerencias adaptadas exactamente al tiempo disponible.</p>
-  </div>
-  <div id="tl-selector">
-    <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(160px,1fr));gap:12px;margin-bottom:28px">
-      <div class="hobby-card" onclick="seleccionarTiempo(this,'15 minutos','15min')" style="text-align:center;padding:24px 16px">
-        <span class="hobby-icon">&#x26A1;</span>
-        <div class="hobby-name">15 minutos</div>
-        <div style="font-size:11px;color:var(--muted);margin-top:4px">Muy poco tiempo</div>
-      </div>
-      <div class="hobby-card" onclick="seleccionarTiempo(this,'30 minutos','30min')" style="text-align:center;padding:24px 16px">
-        <span class="hobby-icon">&#x1F550;</span>
-        <div class="hobby-name">30 minutos</div>
-        <div style="font-size:11px;color:var(--muted);margin-top:4px">Un rato</div>
-      </div>
-      <div class="hobby-card" onclick="seleccionarTiempo(this,'1 hora','1h')" style="text-align:center;padding:24px 16px">
-        <span class="hobby-icon">&#x1F551;</span>
-        <div class="hobby-name">1 hora</div>
-        <div style="font-size:11px;color:var(--muted);margin-top:4px">Tiempo suficiente</div>
-      </div>
-      <div class="hobby-card" onclick="seleccionarTiempo(this,'2 horas','2h')" style="text-align:center;padding:24px 16px">
-        <span class="hobby-icon">&#x1F552;</span>
-        <div class="hobby-name">2 horas</div>
-        <div style="font-size:11px;color:var(--muted);margin-top:4px">Buena tarde</div>
-      </div>
-      <div class="hobby-card" onclick="seleccionarTiempo(this,'media jornada (3-4 horas)','4h')" style="text-align:center;padding:24px 16px">
-        <span class="hobby-icon">&#x1F305;</span>
-        <div class="hobby-name">Media jornada</div>
-        <div style="font-size:11px;color:var(--muted);margin-top:4px">3-4 horas</div>
-      </div>
-      <div class="hobby-card" onclick="seleccionarTiempo(this,'todo el dia','dia')" style="text-align:center;padding:24px 16px">
-        <span class="hobby-icon">&#x2600;&#xFE0F;</span>
-        <div class="hobby-name">Todo el dia</div>
-        <div style="font-size:11px;color:var(--muted);margin-top:4px">Jornada completa</div>
-      </div>
-    </div>
-    <div class="field-group">
-      <label class="field-label">Tu ciudad</label>
-      <input class="field-input" id="tl-city" type="text" placeholder="Tu ciudad...">
-    </div>
-    <div class="field-group">
-      <label class="field-label">Preferencia (opcional)</label>
-      <input class="field-input" id="tl-pref" type="text" placeholder="ej: sin gastar dinero, al aire libre, en casa...">
-    </div>
-    <div class="error-box" id="tl-err">Selecciona cuanto tiempo tienes.</div>
-    <button class="btn-main" onclick="generarTiempoLibre()"><span>Ver ideas</span></button>
-  </div>
-  <div id="tl-loading" style="display:none">
-    <div class="loading-wrap">
-      <p class="loading-title">Buscando ideas para tu tiempo...</p>
-      <p class="loading-sub">Adaptando sugerencias a tu disponibilidad</p>
-      <div class="progress-bar"><div class="progress-fill" id="tl-prog"></div></div>
-      <div class="loading-steps">
-        <div class="loading-step" id="tl-ls1">Analizando tiempo disponible</div>
-        <div class="loading-step" id="tl-ls2">Generando ideas adaptadas</div>
-        <div class="loading-step" id="tl-ls3">Añadiendo detalles practicos</div>
-      </div>
-    </div>
-  </div>
-  <div id="tl-results" style="display:none">
-    <div class="results-header">
-      <div>
-        <div class="results-location" id="tl-res-meta">--</div>
-        <h2 style="font-family:'Playfair Display',serif;font-size:28px;font-weight:700;margin-top:4px">Ideas para tu tiempo</h2>
-      </div>
-      <button class="btn-restart" onclick="tlRestart()">Cambiar tiempo</button>
-    </div>
-    <div class="events-grid" id="tl-grid"></div>
   </div>
 </div>
 
@@ -2444,6 +2368,7 @@ function fixUrl(url, tipo, titulo) {
     case 'deporte': return buscaGoogle(titulo, 'entradas', true);
     case 'feria':   return buscaGoogle(titulo, '', true);
     case 'restaurantes': return buscaGoogle(titulo, 'restaurante', true);
+    case 'articulo': return buscaGoogle(titulo, '', false);
     case 'local':   return buscaGoogle(titulo, '', true);
     case 'gratis':  return buscaGoogle(titulo, '', true);
     case 'serie':   return buscaGoogle(titulo, 'serie dónde ver', false);
@@ -2454,6 +2379,27 @@ function fixUrl(url, tipo, titulo) {
   // Si no, caemos al buscador específico del tipo, o a Google con la ciudad.
   const fb = TIPO_URL_FALLBACK[tipo];
   return fb ? fb(titulo) : buscaGoogle(titulo, '', true);
+}
+
+// Enlaces de la sección Aficiones: cada herramienta recomienda y le construimos una
+// búsqueda robusta a partir del título, sin fiarnos de la URL que invente la IA (que suele dar 404).
+function enlaceAficion(afId, titulo) {
+  const c = currentCity || '';
+  const g = (extra, conCiudad) => 'https://www.google.es/search?q=' +
+    encodeURIComponent([titulo, extra || '', conCiudad ? c : ''].filter(Boolean).join(' ').trim());
+  switch (afId) {
+    case 'cine':      return g('tráiler película', false);
+    case 'lectura':   return g('libro comprar', false);
+    case 'compras':   return 'https://www.amazon.es/s?k=' + encodeURIComponent(titulo);
+    case 'noticias':  return g('', false);
+    case 'cultura':   return g('', true);
+    case 'deporte':   return g('ruta', true);
+    case 'escapadas': return g('turismo qué ver', false);
+    case 'grupo':     return g('', true);
+    case 'bienestar': return g('', false);
+    case 'restaurantes': return g('restaurante', true);
+    default:          return g('', true);
+  }
 }
 
 // ══ COCINA ══
@@ -2560,7 +2506,7 @@ function renderCocinaRecipes(plan, modeName) {
     const card = document.createElement('div');
     card.className = 'recipe-card';
     card.dataset.idx = i;
-    const searchUrl = r.url_receta || ('https://www.directoalpaladar.es/?s=' + encodeURIComponent(r.titulo));
+    const searchUrl = 'https://www.google.es/search?q=' + encodeURIComponent(r.titulo + ' receta');
     card.innerHTML = `
       <span class="recipe-badge">${r.badge || 'plato'}</span>
       <div class="recipe-title">${r.titulo}</div>
@@ -3587,47 +3533,6 @@ Genera 6 ideas de planes para ese grupo en esa ciudad. Responde SOLO JSON sin ba
 {"intro":"frase sobre los planes propuestos para el grupo","items":[{"titulo":"Nombre del plan","subtitulo":"Tipo · Personas ideales","descripcion":"2-3 frases sobre el plan, por qué funciona para ese grupo y qué incluye","destacados":["Presupuesto por persona","Duración","Nivel de actividad"],"consejo":"cómo organizarlo bien: reservas, mejor día, variante si llueve","buscar_url":"URL real del lugar o actividad: web oficial, tripadvisor o ticketera"}]}`
   },
   {
-    id: 'juegos',
-    icon: '🎮',
-    name: 'Juegos móvil',
-    desc: 'Los mejores juegos para Android e iOS según tus géneros favoritos',
-    tag: 'gaming',
-    eyebrow: 'Juegos para el móvil',
-    title: 'Mata el aburrimiento jugando',
-    sub: 'Selecciona género y tiempo disponible y te recomendamos los mejores juegos, gratuitos y de pago.',
-    btnLabel: 'Buscar juegos',
-    loadingTitle: 'Buscando los mejores juegos...',
-    needsCity: false,
-    fields: [
-      { id:'juegos-genero', label:'Género favorito', type:'toggle', options:['Acción','Estrategia','Puzzles','RPG','Deportes','Casual','Terror','Aventura'] },
-      { id:'juegos-tiempo', label:'Tiempo disponible', type:'toggle', options:['5-10 min','30 min','1-2 horas','Sin límite'] },
-      { id:'juegos-precio', label:'Precio', type:'toggle', options:['Solo gratis','Cualquiera','De pago'] }
-    ],
-    prompt: (f,city,extra) => `Eres experto en videojuegos móvil. Género: "${f['juegos-genero']||'cualquiera'}". Tiempo: "${f['juegos-tiempo']||'libre'}". Precio: "${f['juegos-precio']||'cualquiera'}".${extra?' Extra: '+extra:''}
-Recomienda 6 juegos reales para Android e iOS. Responde SOLO JSON sin backticks:
-{"intro":"frase sobre la selección","items":[{"titulo":"Nombre del juego","subtitulo":"Género · Precio","descripcion":"2 frases: qué es y por qué engancha","destacados":["Precio","Valoración","Tiempo por partida"],"consejo":"tip útil: modo multijugador, nivel para empezar, alternativa similar","buscar_url":"URL real de la ficha del juego en Google Play o App Store"}]}`
-  },
-  {
-    id: 'musica',
-    icon: '🎵',
-    name: 'Música & Playlists',
-    desc: 'Playlists en Spotify, YouTube y Amazon según tu estado de ánimo',
-    tag: 'playlists',
-    eyebrow: 'Música personalizada',
-    title: '¿Cómo te sientes ahora?',
-    sub: 'Selecciona tu estado de ánimo y te sugerimos las playlists perfectas.',
-    btnLabel: 'Ver playlists',
-    loadingTitle: 'Buscando tu música perfecta...',
-    needsCity: false,
-    fields: [
-      { id:'musica-mood', label:'Estado de ánimo', type:'toggle', options:['Feliz','Relajado/a','Con energía','Melancólico/a','Concentrado/a','Romántico/a','Fiestero/a'] },
-      { id:'musica-ocasion', label:'Ocasión', type:'toggle', options:['Trabajar/estudiar','Deporte','Relajarme','Fiesta','Conducir','Dormir'] }
-    ],
-    prompt: (f,city,extra) => `Eres experto en música. Estado de ánimo: "${f['musica-mood']||'neutral'}". Ocasión: "${f['musica-ocasion']||'cualquiera'}".${extra?' Preferencias: '+extra:''}
-Sugiere 5 playlists perfectas. Responde SOLO JSON sin backticks:
-{"intro":"frase sobre el ambiente musical","items":[{"titulo":"Nombre creativo de la playlist","subtitulo":"Géneros principales","descripcion":"2 frases sobre el vibe y qué incluye","destacados":["~40 canciones","Artistas clave","Duración aprox."],"consejo":"canción para empezar, mejor plataforma para este estilo","buscar_url":"URL real de la playlist en Spotify o YouTube Music"}]}`
-  },
-  {
     id: 'restaurantes',
     icon: '🍽️',
     name: 'Restaurantes',
@@ -3864,7 +3769,7 @@ function renderAficionResults(items, af) {
       <div style="font-size:13px;color:#5a5040;line-height:1.6;margin-bottom:12px">${item.descripcion}</div>
       ${item.consejo ? `<div style="font-size:12px;color:var(--warm);line-height:1.5;padding:10px 12px;background:#fdf8f0;border-left:2px solid var(--gold);margin-bottom:14px">💡 ${item.consejo}</div>` : ''}
       <div style="display:flex;gap:8px;flex-wrap:wrap;align-items:center">
-        <a href="${fixUrl(item.buscar_url, af.id, item.titulo)}" target="_blank" rel="noopener" style="font-family:'DM Mono',monospace;font-size:10px;letter-spacing:1px;text-transform:uppercase;color:var(--blue);text-decoration:none;border-bottom:1px solid var(--blue);padding-bottom:1px">Ver más →</a>
+        <a href="${enlaceAficion(af.id, item.titulo)}" target="_blank" rel="noopener" style="font-family:'DM Mono',monospace;font-size:10px;letter-spacing:1px;text-transform:uppercase;color:var(--blue);text-decoration:none;border-bottom:1px solid var(--blue);padding-bottom:1px">Ver más →</a>
         <button class="btn-agenda" onclick="openAgendaModal('${escQ(item.titulo)}','${escQ(item.descripcion)}','${af.name}')">＋ Agenda</button>
       </div>
     `;
