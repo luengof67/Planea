@@ -2388,7 +2388,14 @@ function enlaceAficion(afId, titulo) {
   const g = (extra, conCiudad) => 'https://www.google.es/search?q=' +
     encodeURIComponent([titulo, extra || '', conCiudad ? c : ''].filter(Boolean).join(' ').trim());
   switch (afId) {
-    case 'cine':      return g('tráiler película', false);
+    case 'cine': {
+      const enCine = (aficionFieldValues['cine-formato']||'') === 'En el cine';
+      if (enCine) {
+        const ciudad = currentCity || (typeof profile !== 'undefined' ? (profile.city||'') : '');
+        return 'https://www.google.es/search?q=' + encodeURIComponent((titulo + ' cartelera cine ' + ciudad).trim());
+      }
+      return g('tráiler película', false);
+    }
     case 'lectura':   return g('libro comprar', false);
     case 'compras':   return 'https://www.amazon.es/s?k=' + encodeURIComponent(titulo);
     case 'noticias':  return g('', false);
@@ -3385,9 +3392,18 @@ const AFICIONES = [
       { id:'cine-mood', label:'Estado de ánimo / género', type:'toggle', options:['Acción','Comedia','Drama','Terror','Thriller','Ciencia ficción','Romance','Animación','Documental','Llorar un rato'] },
       { id:'cine-formato', label:'¿Cine o en casa?', type:'toggle', options:['En el cine','En casa','Cualquiera'] }
     ],
-    prompt: (f,city,extra) => `Eres un experto en cine. El usuario quiere: "${f['cine-mood']}", formato: "${f['cine-formato']||'cualquiera'}".${extra?' Extra: '+extra:''}
-Genera 6 recomendaciones de películas. Responde SOLO JSON sin backticks:
-{"intro":"frase sobre las recomendaciones","items":[{"titulo":"Título original (Año)","subtitulo":"Director · Género","descripcion":"2 frases por qué encaja con el estado de ánimo","destacados":["Duración","Plataforma/Cine","Valoración IMDb"],"consejo":"dato curioso o por qué verla ahora","buscar_url":"URL real del tráiler en YouTube, ficha en IMDb o página oficial de la película"}]}`
+    prompt: (f,city,extra) => {
+      const enCine = (f['cine-formato']||'') === 'En el cine';
+      const ciudad = (typeof profile !== 'undefined' && profile.city) ? profile.city : (city || 'mi ciudad');
+      if (enCine) {
+        return `Eres un experto en cine. Usa la búsqueda web para consultar la CARTELERA ACTUAL de cines en "${ciudad}" en estos días. Género/estado de ánimo: "${f['cine-mood']}".${extra?' Extra: '+extra:''}
+Recomienda 6 películas que estén AHORA MISMO en cartelera en cines de "${ciudad}" (estrenos recientes o reestrenos en sala, verificados con la búsqueda web). PROHIBIDO recomendar películas antiguas o que solo estén en plataformas de streaming. Responde SOLO JSON sin backticks:
+{"intro":"frase sobre los estrenos en cartelera ahora","items":[{"titulo":"Título (Año)","subtitulo":"Director · Género","descripcion":"2 frases: de qué va y por qué verla","destacados":["Duración","En cines ahora","Valoración"],"consejo":"por qué merece verla en pantalla grande","buscar_url":"-"}]}`;
+      }
+      return `Eres un experto en cine. El usuario quiere ver en casa: "${f['cine-mood']}".${extra?' Extra: '+extra:''}
+Genera 6 recomendaciones de películas para ver en casa (cualquier época, disponibles en plataformas). Responde SOLO JSON sin backticks:
+{"intro":"frase sobre las recomendaciones","items":[{"titulo":"Título original (Año)","subtitulo":"Director · Género","descripcion":"2 frases por qué encaja con el estado de ánimo","destacados":["Duración","Plataforma","Valoración IMDb"],"consejo":"dato curioso o por qué verla","buscar_url":"-"}]}`;
+    }
   },
   {
     id: 'cultura',
@@ -3704,20 +3720,23 @@ async function generateAficion() {
   });
 
   const prompt = af.prompt(aficionFieldValues, city, extra);
+  const usarBusqueda = (af.id === 'cine' && (aficionFieldValues['cine-formato']||'') === 'En el cine');
 
   try {
+    const cuerpo = {
+      model: 'claude-haiku-4-5-20251001',
+      max_tokens: usarBusqueda ? 4000 : 3000,
+      system: 'Eres un asistente experto. Responde SIEMPRE en español. Devuelve SOLO JSON válido sin markdown ni texto extra.',
+      messages: [{ role:'user', content: prompt }]
+    };
+    if (usarBusqueda) cuerpo.tools = [{ type: 'web_search_20250305', name: 'web_search' }];
     const response = await fetch('https://planea-api.luengof67.workers.dev', {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
         'anthropic-version': '2023-06-01',
       },
-      body: JSON.stringify({
-        model: 'claude-haiku-4-5-20251001',
-        max_tokens: 3000,
-        system: 'Eres un asistente experto. Responde SIEMPRE en español. Devuelve SOLO JSON válido sin markdown ni texto extra.',
-        messages: [{ role:'user', content: prompt }]
-      })
+      body: JSON.stringify(cuerpo)
     });
     const data = await response.json();
     // Surface API-level errors (bad key, model not found, etc.)
